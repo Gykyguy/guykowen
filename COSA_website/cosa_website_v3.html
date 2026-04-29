@@ -1,0 +1,4261 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COSA STUDIO</title>
+    <link rel="stylesheet" href="https://use.typekit.net/mtz2wth.css">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: sans-serif;
+            color: #000;
+            background: #fff;
+            height: 100vh;
+            overflow: auto;
+        }
+
+        /* Fixed Top Navigation */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #fff;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 1000;
+            border-top: 0.5mm solid #e5e5e5;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .nav-left { justify-self: start; }
+        .logo { justify-self: center; }
+        .nav-right { justify-self: end; }
+
+        /* Left Navigation */
+        .nav-left {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #000;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: lowercase;
+            letter-spacing: 0.12em;
+            position: relative;
+            padding: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: #ff0000;
+        }
+        .nav-item-dropdown {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .nav-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 160px;
+            background: #fff;
+            border: none;
+            box-shadow: none;
+            padding: 8px 0;
+            display: none;
+            z-index: 1100;
+            pointer-events: auto;
+        }
+        .nav-item-dropdown:hover .nav-dropdown-menu {
+            display: block;
+        }
+        .nav-dropdown-item {
+            display: block;
+            padding: 8px 16px;
+            color: #000;
+            text-decoration: none;
+            text-transform: lowercase;
+            letter-spacing: 0.1em;
+            font-size: 12px;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+        .nav-dropdown-item:hover {
+            color: #ff0000;
+            background: #fff;
+        }
+
+        /* Center Logo/Headline */
+        .logo {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            color: #000;
+            text-decoration: none;
+        }
+        .logo img {
+            height: 55px;
+            width: auto;
+            display: block;
+        }
+
+        /* Right Navigation */
+        .nav-right {
+            display: flex;
+        }
+
+        .contact-link {
+            text-decoration: none;
+            color: #000;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: lowercase;
+            letter-spacing: 0.12em;
+            position: relative;
+            padding: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .contact-link:hover {
+            color: #ff0000;
+        }
+
+        /* Home hero: horizontal scroll (project / shop); home uses .home-vertical */
+        .hero {
+            position: relative;
+            margin-top: 80px;
+            width: 100%;
+            height: calc(100vh - 80px);
+            overflow-x: auto;
+            overflow-y: hidden;
+            background: #fff;
+            scroll-behavior: auto;
+        }
+
+        /* Home: vertical gallery — full width, two halves per row, scroll down */
+        .home-vertical {
+            width: 100%;
+            margin-top: 80px;
+            background: #fff;
+        }
+
+        .home-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 100%;
+            min-height: min(78vh, 820px);
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .home-first-images {
+            margin-top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 3mm;
+            background: #fff;
+            padding: 0 3mm;
+            box-sizing: border-box;
+        }
+        .home-first-images img {
+            width: auto;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            background: #fff;
+            transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .home-short-copy {
+            padding: 24px 3mm 28px;
+            background: #fff;
+            box-sizing: border-box;
+        }
+        .home-short-copy p {
+            margin: 0 auto;
+            max-width: 62em;
+            font-size: 11pt;
+            line-height: 1.65;
+            color: #000;
+        }
+        .home-pair-images {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 3mm;
+            background: #fff;
+            padding: 0 3mm;
+            box-sizing: border-box;
+        }
+        .home-pair-images[aria-label="Home image pair one"],
+        .home-pair-images[aria-label="Home image pair two"],
+        .home-pair-images[aria-label="Home image pair three"] {
+            gap: 3mm;
+            column-gap: 3mm;
+        }
+        .home-pair-images img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+        .home-pair-images:last-of-type {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 3mm;
+        }
+        .home-pair-images:last-of-type img {
+            width: auto;
+            height: min(92vh, 980px);
+            object-fit: cover;
+            object-position: center;
+            flex: 0 0 auto;
+        }
+        .home-project-content {
+            margin-top: 80px;
+            padding: 28px 30px 36px;
+            background: #fff;
+            box-sizing: border-box;
+        }
+        .home-project-content p {
+            margin: 0;
+            max-width: 72em;
+            font-size: 11pt;
+            line-height: 1.65;
+            color: #000;
+        }
+        .home-project-content p + p {
+            margin-top: 1em;
+        }
+        .home-project-layout {
+            margin-top: 80px;
+            height: calc(100vh - 80px);
+        }
+        .home-screen-layout {
+            margin-top: 80px;
+            height: calc(100vh - 80px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .home-categories {
+            display: grid;
+            grid-template-columns: repeat(3, 300px);
+            column-gap: 70px;
+            row-gap: 70px;
+            padding: 48px 30px 60px;
+            background: #fff;
+            box-sizing: border-box;
+            width: 100%;
+            align-items: start;
+            justify-content: center;
+        }
+        .home-categories-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 0;
+            position: relative;
+        }
+        .home-categories-title {
+            margin: 0;
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            padding: 6px 12px;
+            font-size: 12pt;
+            font-weight: 700;
+            letter-spacing: normal;
+            font-variant-caps: all-small-caps;
+            color: #000;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 0;
+            display: inline-block;
+            line-height: 1;
+            text-align: center;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+        .home-categories-item:hover .home-categories-title,
+        .home-categories-item:focus-within .home-categories-title {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+        .home-categories-item img {
+            width: 300px;
+            height: 300px;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+        }
+        .home-categories-item:nth-child(1) img {
+            width: 250px;
+            height: 250px;
+            max-width: 250px;
+            max-height: 250px;
+            min-width: 0;
+            margin-top: 25px;
+            object-fit: contain;
+            object-position: center;
+        }
+        .home-categories-item:nth-child(3) img {
+            width: 300px;
+            height: 300px;
+            transform: scale(0.65);
+            transform-origin: center center;
+        }
+        @media (max-width: 900px) {
+            .home-categories {
+                grid-template-columns: 1fr;
+            }
+        }
+        .home-categories-item--link {
+            cursor: pointer;
+        }
+
+        /* Terrain page */
+        .terrain-screen {
+            margin-top: 80px;
+            padding: 40px 5% 80px;
+            background: #fff;
+            box-sizing: border-box;
+            height: calc(100vh - 80px);
+            overflow-y: hidden;
+        }
+        .terrain-screen.terrain-screen--expanded {
+            overflow-y: auto;
+        }
+        .terrain-screen.terrain-screen--expanded .terrain-page-wrap {
+            transform: translateY(-50px);
+            padding-top: 0;
+        }
+        .terrain-page-wrap {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .terrain-page-wrap:is(.is-fence-open, .is-plants-open, .is-terraces-open),
+        .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) {
+            max-width: min(1700px, 98vw);
+        }
+        .terrain-page-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0;
+            align-items: start;
+        }
+        .terrain-top-focus {
+            display: none;
+            width: 100%;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+        }
+        .terrain-top-focus img {
+            width: auto;
+            object-fit: contain;
+            display: block;
+        }
+        .terrain-top-focus .terrain-top-focus-left {
+            height: 600px;
+        }
+        .terrain-top-focus .terrain-top-focus-right {
+            height: 400px;
+        }
+        .terrain-page-wrap.is-top-focus-open .terrain-top-focus {
+            display: flex;
+        }
+        .terrain-page-wrap.is-top-focus-open .terrain-page-grid,
+        .terrain-page-wrap.is-top-focus-open .terrain-bottom-row {
+            display: none;
+        }
+        .terrain-page-wrap.is-plants-open .terrain-page-grid,
+        .terrain-page-wrap.is-fence-open .terrain-page-grid,
+        .terrain-page-wrap.is-terraces-open .terrain-page-grid,
+        .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-page-grid {
+            display: none;
+        }
+        .terrain-hero-stack {
+            position: relative;
+            width: 65%;
+            margin-left: auto;
+            margin-right: auto;
+            cursor: pointer;
+        }
+        .terrain-hero-stack:hover,
+        .terrain-hero-stack.is-overlay-locked {
+            overflow: visible;
+            z-index: 12000;
+        }
+        .terrain-hero-stack.is-overlay-locked {
+            width: auto;
+            height: 700px;
+        }
+        .terrain-hero-stack.is-overlay-locked .terrain-hero-base,
+        .terrain-hero-stack.is-overlay-locked .terrain-hero-overlay {
+            width: auto;
+            height: 700px;
+        }
+        .terrain-hero-stack .terrain-hero-base {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            vertical-align: top;
+        }
+        .terrain-hero-stack .terrain-hero-overlay {
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            width: calc(100% - 10px);
+            height: calc(100% - 10px);
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            opacity: 0;
+            transform: scale(1);
+            transform-origin: center center;
+            transition: opacity 280ms ease, transform 280ms ease;
+            pointer-events: none;
+        }
+        /* Hover or locked: same 4× size (10px tighter box than full stack) */
+        .terrain-hero-stack:hover:not(.is-overlay-locked) .terrain-hero-overlay,
+        .terrain-hero-stack.is-overlay-locked .terrain-hero-overlay {
+            opacity: 1;
+            transform: scale(4);
+        }
+        .terrain-plan-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+        .terrain-plan-stack {
+            position: relative;
+            width: 65%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: -50px;
+            left: -40px;
+            z-index: 2;
+            cursor: pointer;
+        }
+        .terrain-plan-stack .terrain-plan-base {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            vertical-align: top;
+        }
+        .terrain-plan-stack .terrain-plan-overlay {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            opacity: 0;
+            transition: opacity 280ms ease;
+            pointer-events: none;
+        }
+        .terrain-plan-stack:hover .terrain-plan-overlay,
+        .terrain-plan-stack.is-overlay-locked .terrain-plan-overlay {
+            opacity: 1;
+        }
+        .terrain-plan-stack.is-overlay-locked {
+            width: auto;
+            height: 700px;
+        }
+        .terrain-plan-stack.is-overlay-locked .terrain-plan-base,
+        .terrain-plan-stack.is-overlay-locked .terrain-plan-overlay {
+            width: auto;
+            height: 700px;
+        }
+        .terrain-page-wrap:has(#terrain-hero-stack.is-overlay-locked) .terrain-plan-stack,
+        .terrain-page-wrap:has(#terrain-hero-stack.is-overlay-locked) .terrain-stairs-stack,
+        .terrain-page-wrap:has(#terrain-hero-stack.is-overlay-locked) .terrain-bottom-row {
+            display: none;
+        }
+        .terrain-page-wrap:has(#terrain-plan-stack.is-overlay-locked) .terrain-hero-stack,
+        .terrain-page-wrap:has(#terrain-plan-stack.is-overlay-locked) .terrain-stairs-stack,
+        .terrain-page-wrap:has(#terrain-plan-stack.is-overlay-locked) .terrain-bottom-row {
+            display: none;
+        }
+        .terrain-stairs-stack {
+            position: relative;
+            width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: -50px;
+            right: 40px;
+            z-index: 1;
+            cursor: pointer;
+        }
+        .terrain-stairs-stack .terrain-stairs-base {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+        .terrain-stairs-stack .terrain-stairs-hover {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            opacity: 0;
+            transition: opacity 280ms ease;
+            pointer-events: none;
+        }
+        .terrain-stairs-stack:hover:not(.is-expanded) .terrain-stairs-hover {
+            opacity: 1;
+        }
+        .terrain-stairs-expand-row {
+            display: none;
+            width: 100%;
+            align-items: stretch;
+            gap: 0;
+            height: min(68vh, 700px);
+        }
+        .terrain-stairs-expand-row img {
+            flex: 1 1 50%;
+            min-width: 0;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .terrain-stairs-stack.is-expanded {
+            width: 100%;
+            grid-column: 1 / -1;
+            right: 0;
+            margin-top: 0;
+        }
+        .terrain-stairs-stack.is-expanded .terrain-stairs-base {
+            display: none;
+        }
+        .terrain-stairs-stack.is-expanded .terrain-stairs-hover {
+            display: none;
+        }
+        .terrain-stairs-stack.is-expanded .terrain-stairs-expand-row {
+            display: flex;
+        }
+        .terrain-page-wrap:has(#terrain-stairs-stack.is-expanded) .terrain-hero-stack,
+        .terrain-page-wrap:has(#terrain-stairs-stack.is-expanded) .terrain-plan-stack {
+            display: none;
+        }
+        .terrain-page-wrap:has(#terrain-stairs-stack.is-expanded) .terrain-bottom-row {
+            display: none;
+        }
+        .terrain-stairs-note {
+            margin: 0;
+            width: 400px;
+            max-width: 100%;
+            font-size: 11pt;
+            line-height: 1.65;
+            color: #000;
+            text-align: left;
+            transform: translateX(150px);
+        }
+        .terrain-stairs-meta {
+            display: none;
+            margin-top: 28px;
+            width: 100%;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 28px;
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .terrain-stairs-meta-images {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .terrain-stairs-meta-images img {
+            width: auto;
+            height: 300px;
+            object-fit: contain;
+            display: block;
+            transform: translateX(-150px);
+        }
+        .terrain-stairs-stack.is-expanded .terrain-stairs-meta {
+            display: flex;
+        }
+        .terrain-bottom-row {
+            width: 100%;
+            margin-top: 0;
+            padding: 50px 0;
+        }
+        .terrain-page-wrap.is-plants-open .terrain-bottom-row,
+        .terrain-page-wrap.is-fence-open .terrain-bottom-row,
+        .terrain-page-wrap.is-terraces-open .terrain-bottom-row,
+        .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-bottom-row {
+            padding-top: 0;
+        }
+        /* Category blocks + image grids share one column flow: collapsed = one centered row; expanded = active header + images + other three thumbnails after */
+        .terrain-category-flow {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            align-content: flex-start;
+            gap: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .terrain-category-flow > .terrain-bottom-fence {
+            transform: translateX(-100px);
+        }
+        .terrain-category-flow > .terrain-bottom-coco {
+            transform: translateX(-50px);
+        }
+        .terrain-category-flow > .terrain-bottom-insect {
+            transform: translateX(50px);
+        }
+        .terrain-page-wrap.is-plants-open .terrain-category-flow {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) repeat(3, auto);
+            gap: 16px 12px;
+            align-items: start;
+        }
+        .terrain-page-wrap.is-plants-open .terrain-bottom-coco {
+            grid-column: 1 / -1;
+            grid-row: 1;
+            justify-self: center;
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .terrain-page-wrap.is-plants-open .terrain-plants-grid {
+            grid-column: 1 / -1;
+            grid-row: 2;
+            margin-top: 0;
+            margin-bottom: 0;
+            width: min(1700px, 100%);
+            max-width: 100%;
+            justify-self: center;
+        }
+        .terrain-page-wrap.is-plants-open .terrain-bottom-fence { grid-column: 2; grid-row: 3; }
+        .terrain-page-wrap.is-plants-open .terrain-bottom-terrace { grid-column: 3; grid-row: 3; }
+        .terrain-page-wrap.is-plants-open .terrain-bottom-insect { grid-column: 4; grid-row: 3; }
+        .terrain-page-wrap.is-plants-open .terrain-bottom-fence,
+        .terrain-page-wrap.is-plants-open .terrain-bottom-terrace,
+        .terrain-page-wrap.is-plants-open .terrain-bottom-insect { display: none; }
+        .terrain-page-wrap.is-fence-open .terrain-category-flow {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) repeat(3, auto);
+            gap: 16px 12px;
+            align-items: start;
+        }
+        .terrain-page-wrap.is-fence-open .terrain-bottom-fence {
+            grid-column: 1 / -1;
+            grid-row: 1;
+            justify-self: center;
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .terrain-page-wrap.is-fence-open .terrain-fence-grid {
+            display: grid;
+            grid-column: 1 / -1;
+            grid-row: 2;
+            margin-top: 0;
+            justify-self: center;
+            width: min(1600px, 100%);
+        }
+        .terrain-page-wrap.is-fence-open .terrain-bottom-coco { grid-column: 2; grid-row: 3; }
+        .terrain-page-wrap.is-fence-open .terrain-bottom-terrace { grid-column: 3; grid-row: 3; }
+        .terrain-page-wrap.is-fence-open .terrain-bottom-insect { grid-column: 4; grid-row: 3; }
+        .terrain-page-wrap.is-fence-open .terrain-bottom-coco,
+        .terrain-page-wrap.is-fence-open .terrain-bottom-terrace,
+        .terrain-page-wrap.is-fence-open .terrain-bottom-insect { display: none; }
+        .terrain-page-wrap.is-terraces-open .terrain-category-flow {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) repeat(3, auto);
+            gap: 16px 12px;
+            align-items: start;
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-bottom-terrace {
+            grid-column: 1 / -1;
+            grid-row: 1;
+            justify-self: center;
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-terraces-grid {
+            display: grid;
+            grid-column: 1 / -1;
+            grid-row: 2;
+            margin-top: 0;
+            justify-self: center;
+            width: min(1600px, 100%);
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-category-flow {
+            grid-template-columns: 1fr;
+            justify-items: center;
+            justify-content: center;
+            row-gap: 24px;
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-bottom-terrace {
+            justify-content: center;
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-terraces-grid {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-bottom-fence { grid-column: 2; grid-row: 3; }
+        .terrain-page-wrap.is-terraces-open .terrain-bottom-coco { grid-column: 3; grid-row: 3; }
+        .terrain-page-wrap.is-terraces-open .terrain-bottom-insect { grid-column: 4; grid-row: 3; }
+        .terrain-page-wrap.is-terraces-open .terrain-bottom-fence,
+        .terrain-page-wrap.is-terraces-open .terrain-bottom-coco,
+        .terrain-page-wrap.is-terraces-open .terrain-bottom-insect { display: none; }
+        .terrain-terrace-left-tall {
+            display: none;
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-category-flow {
+            grid-template-columns: minmax(0, 1fr) auto;
+            column-gap: 24px;
+            row-gap: 24px;
+            justify-items: stretch;
+            align-items: start;
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-terrace-left-tall {
+            display: flex;
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            justify-self: end;
+            align-self: start;
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-terrace-left-tall img {
+            width: auto;
+            height: min(92vh, 830px);
+            object-fit: contain;
+            display: block;
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-bottom-terrace {
+            grid-column: 1;
+            grid-row: 1;
+            justify-self: start;
+            width: 100%;
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-terraces-grid {
+            grid-column: 1;
+            grid-row: 2;
+            justify-self: start;
+            width: 100%;
+            max-width: 100%;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-terraces-intro {
+            max-width: min(46em, 100%);
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-terraces-grid img:nth-child(3) {
+            display: none;
+        }
+        .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-category-flow {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) repeat(3, auto);
+            gap: 16px 12px;
+            align-items: start;
+        }
+        .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-bottom-insect {
+            grid-column: 1 / -1;
+            grid-row: 1;
+            justify-self: center;
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: 0;
+        }
+        .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-bottom-fence { grid-column: 2; grid-row: 2; }
+        .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-bottom-coco { grid-column: 3; grid-row: 2; }
+        .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-bottom-terrace { grid-column: 4; grid-row: 2; }
+        .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-bottom-fence,
+        .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-bottom-coco,
+        .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-bottom-terrace { display: none; }
+        .terrain-bottom-coco {
+            flex: 0 0 auto;
+            align-self: flex-start;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 16px;
+            min-width: 0;
+            position: relative;
+            left: -50px;
+        }
+        .terrain-plants-intro {
+            display: none;
+            flex: 1;
+            min-width: 0;
+            max-width: min(32em, calc(100vw - 520px));
+            margin: 0;
+            padding: 0 8px 0 0;
+            font-size: 11pt;
+            line-height: 1.65;
+            color: #000;
+            text-align: left;
+            align-self: center;
+        }
+        .terrain-page-wrap.is-plants-open .terrain-plants-intro {
+            display: block;
+        }
+        .terrain-coco-btn {
+            border: none;
+            background: none;
+            padding: 0;
+            margin: 0;
+            line-height: 0;
+            cursor: pointer;
+            display: block;
+        }
+        .terrain-coco-btn img {
+            opacity: 1;
+            transition: opacity 220ms ease;
+        }
+        .terrain-coco-btn:hover img {
+            opacity: 0.35;
+        }
+        .terrain-page-wrap.is-plants-open .terrain-coco-btn img {
+            opacity: 1;
+        }
+        .terrain-bottom-coco img {
+            width: 245px;
+            max-width: min(245px, 100%);
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+        .terrain-plants-grid {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            width: min(1700px, calc(100vw - 40px));
+            max-width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        .terrain-plants-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+        .terrain-plants-row:nth-of-type(3) {
+            padding-left: calc(220px + 20px);
+        }
+        .terrain-plants-grid img {
+            height: 250px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .terrain-plants-row .terrain-plants-row-label-wrap {
+            flex: 0 0 220px;
+            width: 220px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .terrain-plants-row .terrain-plants-row-label {
+            display: block;
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        .terrain-plants-row:nth-of-type(1) .terrain-plants-row-label {
+            height: 170px;
+            width: auto;
+        }
+        .terrain-plants-row:nth-of-type(2) .terrain-plants-row-label {
+            height: 200px;
+            width: auto;
+        }
+        .terrain-plants-row:nth-of-type(3) .terrain-plants-row-label {
+            width: 100px;
+            height: auto;
+        }
+        .terrain-page-wrap.is-plants-open .terrain-plants-grid {
+            display: flex;
+        }
+        .terrain-fence-grid {
+            display: none;
+            width: min(1600px, 100%);
+            min-width: 0;
+            margin: 0 auto;
+            padding: 0 0 16px;
+            box-sizing: border-box;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+            justify-items: center;
+            justify-content: center;
+            align-items: center;
+        }
+        .terrain-fence-grid img {
+            height: 400px;
+            max-height: 400px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+        .terrain-fence-grid img.fence-inline-note {
+            height: 100px;
+            max-height: 100px;
+            width: auto;
+        }
+        .terrain-bottom-fence {
+            flex: 0 0 auto;
+            align-self: flex-start;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 16px;
+            min-width: 0;
+            max-width: 100%;
+            position: relative;
+            left: -100px;
+        }
+        .terrain-fence-intro {
+            display: none;
+            flex: 1;
+            min-width: 0;
+            max-width: min(32em, calc(100vw - 520px));
+            margin: 0;
+            padding: 0 8px 0 0;
+            font-size: 11pt;
+            line-height: 1.65;
+            color: #000;
+            text-align: left;
+            align-self: center;
+        }
+        .terrain-page-wrap.is-fence-open .terrain-fence-intro {
+            display: block;
+        }
+        .terrain-page-wrap.is-fence-open .terrain-bottom-fence {
+            gap: 50px;
+        }
+        .terrain-page-wrap.is-fence-open .terrain-fence-grid {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+        }
+        .terrain-fence-btn {
+            border: none;
+            background: none;
+            padding: 0;
+            margin: 0;
+            line-height: 0;
+            cursor: pointer;
+            display: block;
+        }
+        .terrain-fence-btn img {
+            opacity: 1;
+            transition: opacity 220ms ease;
+        }
+        .terrain-fence-btn:hover img {
+            opacity: 0.35;
+        }
+        .terrain-page-wrap.is-fence-open .terrain-fence-btn img {
+            opacity: 1;
+        }
+        .terrain-bottom-fence img {
+            width: 150px;
+            height: auto;
+            max-width: 100%;
+            display: block;
+            object-fit: contain;
+        }
+        .terrain-terraces-grid {
+            display: none;
+            width: min(1600px, 100%);
+            min-width: 0;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 0 16px;
+            box-sizing: border-box;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+            justify-items: center;
+            justify-content: center;
+            align-items: center;
+        }
+        .terrain-terraces-intro {
+            display: none;
+            flex: 1;
+            min-width: 0;
+            max-width: min(32em, calc(100vw - 520px));
+            margin: 0;
+            padding: 0 8px 0 0;
+            font-size: 11pt;
+            line-height: 1.65;
+            color: #000;
+            text-align: left;
+            align-self: center;
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-terraces-intro {
+            display: block;
+        }
+        .terrain-terraces-grid img {
+            height: 400px;
+            max-height: 400px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+        .terrain-terraces-grid img:last-child {
+            margin-left: 40px;
+        }
+        .terrain-bottom-terrace {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 16px;
+            min-width: 0;
+            max-width: 100%;
+            align-self: flex-start;
+            position: relative;
+        }
+        .terrain-terrace-btn {
+            flex: 0 0 auto;
+            border: none;
+            background: none;
+            padding: 0;
+            margin: 0;
+            line-height: 0;
+            cursor: pointer;
+            display: block;
+            align-self: flex-start;
+        }
+        .terrain-terrace-btn img {
+            opacity: 1;
+            transition: opacity 220ms ease;
+        }
+        .terrain-terrace-btn:hover img {
+            opacity: 0.35;
+        }
+        .terrain-page-wrap.is-terraces-open .terrain-terrace-btn img {
+            opacity: 1;
+        }
+        .terrain-bottom-terrace img {
+            height: 400px;
+            width: auto;
+            max-width: 100%;
+            max-height: 400px;
+            display: block;
+            object-fit: contain;
+        }
+        .terrain-bottom-insect {
+            flex: 0 0 auto;
+            min-width: 0;
+            max-width: 100%;
+            display: flex;
+            justify-content: center;
+            padding-top: 0;
+            margin-top: 0;
+            position: relative;
+            left: 50px;
+        }
+        .terrain-insect-stack {
+            position: relative;
+            width: 100%;
+            max-width: min(1200px, 100%);
+            margin: 0 auto;
+        }
+        .terrain-insect-12-btn {
+            display: block;
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
+            margin: 0 auto;
+            line-height: 0;
+        }
+        .terrain-insect-12-btn img {
+            width: auto;
+            height: auto;
+            max-width: 220px;
+            max-height: 160px;
+            display: block;
+            object-fit: contain;
+            opacity: 1;
+            transition: opacity 220ms ease;
+        }
+        .terrain-insect-12-btn:hover img {
+            opacity: 0.35;
+        }
+        .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-insect-12-btn img {
+            opacity: 1;
+        }
+        .terrain-insect-stack.is-expanded .terrain-insect-12-btn {
+            display: none;
+        }
+        .terrain-insect-scatter {
+            display: none;
+            position: relative;
+            width: min(1120px, 100%);
+            min-height: min(820px, 85vh);
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        .terrain-insect-stack.is-expanded .terrain-insect-scatter {
+            display: block;
+        }
+        .terrain-insect-pip {
+            position: absolute;
+            left: calc(var(--x) * 1%);
+            top: calc(var(--y) * 1%);
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            display: block;
+            transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+            z-index: 1;
+        }
+        .terrain-insect-pip--12 {
+            cursor: pointer;
+        }
+        .terrain-insect-pip--1 {
+            width: 100px;
+            height: 100px;
+        }
+        .terrain-insect-pip--8 {
+            width: 150px;
+            height: 150px;
+        }
+        .terrain-insect-pip--11 {
+            width: 120px;
+            height: 120px;
+        }
+        .terrain-insect-scatter img.terrain-insect-pip:nth-of-type(1) { --rot: -5deg; }
+        .terrain-insect-scatter img.terrain-insect-pip:nth-of-type(2) { --rot: 4deg; }
+        .terrain-insect-scatter img.terrain-insect-pip:nth-of-type(3) { --rot: -3deg; }
+        .terrain-insect-scatter img.terrain-insect-pip:nth-of-type(4) { --rot: 6deg; }
+        .terrain-insect-scatter img.terrain-insect-pip:nth-of-type(5) { --rot: -4deg; }
+        .terrain-insect-scatter img.terrain-insect-pip:nth-of-type(6) { --rot: 3deg; }
+        .terrain-insect-scatter img.terrain-insect-pip:nth-of-type(7) { --rot: -6deg; }
+        .terrain-insect-scatter img.terrain-insect-pip:nth-of-type(8) { --rot: 2deg; }
+        .terrain-insect-scatter img.terrain-insect-pip:nth-of-type(9) { --rot: -2deg; }
+        .terrain-insect-scatter img.terrain-insect-pip:nth-of-type(10) { --rot: 5deg; }
+        .terrain-insect-scatter img.terrain-insect-pip:nth-of-type(11) { --rot: -3deg; }
+        .terrain-insect-scatter img.terrain-insect-pip:nth-of-type(12) { --rot: 4deg; }
+        @media (max-width: 900px) {
+            .terrain-page-grid {
+                grid-template-columns: 1fr;
+            }
+            .terrain-category-flow {
+                flex-direction: column;
+                align-items: center;
+            }
+            .terrain-page-wrap.is-plants-open .terrain-category-flow,
+            .terrain-page-wrap.is-fence-open .terrain-category-flow,
+            .terrain-page-wrap.is-terraces-open .terrain-category-flow,
+            .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-category-flow {
+                grid-template-columns: 1fr;
+            }
+            .terrain-page-wrap.is-plants-open .terrain-bottom-fence { grid-column: 1 / -1; grid-row: 3; }
+            .terrain-page-wrap.is-plants-open .terrain-bottom-terrace { grid-column: 1 / -1; grid-row: 4; }
+            .terrain-page-wrap.is-plants-open .terrain-bottom-insect { grid-column: 1 / -1; grid-row: 5; }
+            .terrain-page-wrap.is-fence-open .terrain-bottom-coco { grid-column: 1 / -1; grid-row: 3; }
+            .terrain-page-wrap.is-fence-open .terrain-bottom-terrace { grid-column: 1 / -1; grid-row: 4; }
+            .terrain-page-wrap.is-fence-open .terrain-bottom-insect { grid-column: 1 / -1; grid-row: 5; }
+            .terrain-page-wrap.is-terraces-open .terrain-bottom-fence { grid-column: 1 / -1; grid-row: 3; }
+            .terrain-page-wrap.is-terraces-open .terrain-bottom-coco { grid-column: 1 / -1; grid-row: 4; }
+            .terrain-page-wrap.is-terraces-open .terrain-bottom-insect { grid-column: 1 / -1; grid-row: 5; }
+            .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-bottom-fence { grid-column: 1 / -1; grid-row: 2; }
+            .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-bottom-coco { grid-column: 1 / -1; grid-row: 3; }
+            .terrain-page-wrap:has(#terrain-insect-stack.is-expanded) .terrain-bottom-terrace { grid-column: 1 / -1; grid-row: 4; }
+            .terrain-terraces-grid,
+            .terrain-fence-grid {
+                grid-template-columns: 1fr;
+            }
+            .terrain-bottom-coco,
+            .terrain-bottom-fence,
+            .terrain-bottom-terrace {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .terrain-plants-row:nth-of-type(3) {
+                padding-left: 0;
+            }
+            .terrain-fence-intro,
+            .terrain-plants-intro,
+            .terrain-terraces-intro {
+                max-width: 100%;
+                padding: 12px 0 0;
+            }
+        }
+
+        .home-half {
+            min-width: 0;
+            min-height: min(78vh, 820px);
+            position: relative;
+        }
+
+        .home-half--img {
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+
+        .home-half--img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .home-half--text {
+            padding: clamp(28px, 6vw, 72px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #fff;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #111;
+        }
+
+        .home-half--text p {
+            margin: 0;
+            max-width: 36em;
+        }
+
+        .home-half--text p + p {
+            margin-top: 1.1em;
+        }
+
+        .home-half--blank {
+            background: #fff;
+        }
+
+        /* Project page: static split layout */
+        .project-layout {
+            height: 100%;
+            display: grid;
+            grid-template-columns: calc((100% + 100px) / 2) calc((100% - 100px) / 2);
+            background: #fff;
+            overflow: hidden;
+        }
+        .project-layout-image,
+        .project-layout-copy {
+            min-width: 0;
+            min-height: 0;
+        }
+        .project-layout-image {
+            position: relative;
+            display: flex;
+            align-items: stretch;
+            justify-content: flex-start;
+            overflow: hidden;
+            border-right: 1px solid #e5e5e5;
+        }
+        .project-back-arrow {
+            position: absolute;
+            top: 22px;
+            left: 22px;
+            z-index: 3;
+            padding: 4px;
+        }
+        .project-back-arrow img {
+            filter: brightness(0) invert(1);
+            opacity: 1;
+        }
+        .project-back-arrow:hover img {
+            filter: brightness(0) invert(0.75);
+            opacity: 1;
+        }
+        .project-layout-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: left center;
+            display: block;
+        }
+        .project-layout-copy {
+            padding: clamp(28px, 6vw, 72px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .project-layout-copy p {
+            margin: 0;
+            max-width: 36em;
+            font-size: 11pt;
+            line-height: 1.65;
+            color: #000;
+        }
+        .project-layout-copy p + p {
+            margin-top: 1em;
+        }
+        .about-fullbleed-hero {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            min-height: 680px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .about-fullbleed-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: top center;
+            display: block;
+        }
+        .about-fullbleed-overlay-copy {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            margin-top: -50px;
+            width: min(800pt, calc(100vw - 40px));
+            color: #fff;
+            font-size: 18pt;
+            font-weight: 400;
+            line-height: 1.35;
+            text-align: center;
+            text-wrap: balance;
+            text-shadow: 0 2px 14px rgba(0, 0, 0, 0.65);
+        }
+        .about-overlay-kicker {
+            display: inline;
+            font-weight: 400;
+            letter-spacing: 0.12em;
+        }
+        .about-project-copy {
+            padding: 36px 30px 48px;
+            background: #fff;
+        }
+        .about-project-copy p {
+            margin: 0 auto;
+            max-width: 62em;
+            font-size: 11pt;
+            line-height: 1.65;
+            color: #000;
+        }
+        .about-project-copy p + p {
+            margin-top: 1em;
+        }
+        .about-content-layout {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .about-image-wrap {
+            position: relative;
+            transform: translateX(-100px);
+        }
+        .about-content-layout img {
+            height: 700px;
+            width: auto;
+            max-width: min(48vw, 760px);
+            object-fit: contain;
+            display: block;
+        }
+        .about-image-overlay-lead {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            transform: none;
+            width: min(530px, 86%);
+            margin: 0;
+            color: #fff !important;
+            -webkit-text-fill-color: #fff;
+            font-size: 20pt;
+            font-weight: 700;
+            line-height: 1.35;
+            text-align: left;
+            text-shadow: none;
+        }
+        .about-project-copy p.about-image-overlay-lead {
+            font-size: 20pt !important;
+            line-height: 1.35;
+        }
+        .about-content-text {
+            width: 500px;
+            max-width: 100%;
+            margin-top: 50px;
+        }
+        .about-content-text .about-right-lead {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.65;
+            margin-bottom: 1em;
+        }
+        .about-inline-lead {
+            display: block;
+            width: 450px;
+            max-width: 100%;
+            font-size: 14pt;
+            font-weight: 700;
+        }
+        @media (max-width: 1100px) {
+            .about-content-layout {
+                flex-direction: column;
+                align-items: center;
+            }
+            .about-content-layout img {
+                height: auto;
+                width: min(100%, 760px);
+                max-width: 100%;
+            }
+            .about-image-wrap {
+                transform: none;
+            }
+            .about-image-overlay-lead {
+                top: 20px;
+                left: 20px;
+                transform: none;
+                width: min(470px, 90%);
+            }
+        }
+        .about-triple-images {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3mm;
+            padding: 0 3mm 48px;
+            background: #fff;
+            box-sizing: border-box;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .about-triple-images img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+        .about-shelve-cover {
+            width: 100%;
+            padding: 0 3mm 48px;
+            background: #fff;
+            box-sizing: border-box;
+        }
+        .about-shelve-cover img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .interior-screen {
+            margin-top: 80px;
+            padding: 40px 5% 80px;
+            background: #fff;
+        }
+        .interior-wrap {
+            width: min(1500px, 100%);
+            margin: 0 auto;
+        }
+        .interior-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: lowercase;
+            margin: 0 0 14px;
+        }
+        .interior-detail-line {
+            margin: 0 0 20px;
+            font-size: 11pt;
+            line-height: 1.65;
+            color: #000;
+        }
+        .interior-block {
+            margin-bottom: 70px;
+        }
+        .interior-block + .interior-block {
+            border-top: 0.5mm solid #e5e5e5;
+            padding-top: 46px;
+        }
+        .interior-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 26px;
+            align-items: stretch;
+            margin-bottom: 26px;
+        }
+        .interior-row img {
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+            object-fit: cover;
+            display: block;
+            background: #f6f6f6;
+        }
+        .interior-row-full {
+            margin-bottom: 26px;
+        }
+        .interior-row-full img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .interior-paragraph-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            padding: 10px 0;
+        }
+        .interior-paragraph-cell p {
+            width: 500px;
+            max-width: 100%;
+            margin: 0;
+            font-size: 11pt;
+            line-height: 1.65;
+            color: #000;
+        }
+        .interior-paragraph-stack {
+            width: 500px;
+            max-width: 100%;
+        }
+        @media (max-width: 980px) {
+            .interior-row {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+            .interior-row img,
+            .interior-paragraph-cell {
+                min-height: 0;
+            }
+            .interior-paragraph-cell {
+                justify-content: flex-start;
+            }
+        }
+
+        .home-half--text .home-kicker {
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 1.25em;
+            color: #666;
+        }
+
+        /* Plans: drawing thumbnails */
+        .plans-screen {
+            margin-top: 80px;
+            padding: 30px 30px 80px;
+            background: #fff;
+            box-sizing: border-box;
+        }
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 30px;
+            margin-top: -50px;
+            justify-content: stretch;
+            align-items: stretch;
+            grid-auto-flow: dense;
+        }
+        .plans-grid-cell {
+            width: 100%;
+            aspect-ratio: 1;
+            min-height: 0;
+            overflow: hidden;
+            background: #fff;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .plans-grid-cell img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+        }
+        /* Make default plan tiles visually 50% smaller without affecting expanded view. */
+        .plans-grid-cell:not(.plans-grid-cell--interactive):not(.plans-grid-cell--pair-expanded) > img {
+            width: 65%;
+            height: 65%;
+        }
+        .plans-grid-cell--empty {
+            pointer-events: none;
+            background: transparent;
+            border: none;
+        }
+        .plans-grid-cell--interactive {
+            cursor: pointer;
+            position: relative;
+        }
+        .plans-hover-stack {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .plans-grid-cell--interactive:not(.plans-grid-cell--pair-expanded) .plans-hover-stack {
+            transform: scale(0.65);
+            transform-origin: center;
+        }
+        .plans-hover-stack .plans-hover-base,
+        .plans-hover-stack .plans-hover-alt {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .plans-hover-stack .plans-hover-alt {
+            opacity: 0;
+        }
+        .plans-grid-cell--interactive:hover:not(.plans-grid-cell--pair-expanded) .plans-hover-alt {
+            opacity: 1;
+        }
+        .plans-grid-cell--interactive:hover:not(.plans-grid-cell--pair-expanded) .plans-hover-base {
+            opacity: 0;
+        }
+        .plans-grid-cell--interactive.plans-grid-cell--pair-expanded {
+            grid-column: 1 / -1;
+            grid-row: span 1;
+            aspect-ratio: auto;
+            height: min(68vh, 700px);
+            max-height: 700px;
+            align-self: stretch;
+            scroll-margin-top: 96px;
+            animation: plansPairGrowFromTop 700ms cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .plans-expand-row {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+            gap: 0;
+        }
+        .plans-expand-row img {
+            flex: 1 1 50%;
+            min-width: 0;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+        }
+        .plans-grid--pair-open {
+            column-gap: 0;
+            row-gap: 30px;
+        }
+        @keyframes plansPairGrowFromTop {
+            0% { transform: scale(0.96); opacity: 0.35; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @media (max-width: 900px) {
+            .plans-grid-cell--interactive.plans-grid-cell--pair-expanded {
+                grid-column: 1 / -1;
+                height: min(56vh, 700px);
+                max-height: 700px;
+            }
+        }
+        @media (max-width: 480px) {
+            .plans-grid-cell--interactive.plans-grid-cell--pair-expanded {
+                height: min(52vh, 700px);
+                max-height: 700px;
+            }
+        }
+        @media (max-width: 900px) {
+            .plans-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 480px) {
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Shop page: gallery below product grid — full bleed to viewport edges */
+        .hero.hero-shop-gallery {
+            height: min(92vh, 900px);
+            max-height: calc(100vh - 80px);
+            margin-top: 64px;
+            width: 100vw;
+            max-width: none;
+            margin-left: calc(50% - 50vw);
+            box-sizing: border-box;
+        }
+        .shop-gallery-arrow {
+            position: fixed;
+            top: calc(50vh + 40px);
+            z-index: 5;
+            width: 54px;
+            height: 54px;
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            line-height: 0;
+            opacity: 0;
+            transform: translateY(-50%);
+            transition: opacity 0.22s ease, transform 0.22s ease;
+            pointer-events: none;
+        }
+        .shop-gallery-arrow img {
+            width: 54px;
+            height: 54px;
+            display: block;
+            filter: brightness(0) invert(1);
+        }
+        .shop-gallery-arrow--left {
+            left: 20px;
+        }
+        .shop-gallery-arrow--right {
+            right: 20px;
+        }
+        .shop-gallery-arrow--left img {
+            transform: scaleX(1);
+        }
+        .shop-gallery-arrow--right img {
+            transform: scaleX(-1);
+        }
+        .shop-gallery-arrow.is-active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .shop-gallery-arrow:hover {
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        .hero-inner {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            min-width: max-content;
+        }
+
+        .image-item {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            margin-right: 0;
+            border-right: 1px solid #e5e5e5;
+            flex-shrink: 0;
+        }
+
+        .image-item img {
+            height: calc(100% - 10px);
+            width: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        .image-divider {
+            background: #e5e5e5;
+            width: 1px;
+            margin: 0 2.5px;
+        }
+
+        .image-item:last-child { 
+            margin-right: 0;
+            border-right: none;
+        }
+
+        /* Transparent SHOP button */
+        .shop-btn {
+            position: absolute;
+            z-index: 2;
+            bottom: 60px;
+            left: 60px;
+            padding: 10px 60px;
+            font-size: 16px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: #fff;
+            background: transparent;
+            border: 1px solid #fff;
+            border-radius: 0;
+            cursor: pointer;
+            backdrop-filter: none;
+            transition: all 0.3s ease;
+        }
+        
+        .shop-btn:hover {
+            background: #fff;
+            color: #000;
+            transform: translateX(10px);
+        }
+        
+        .shop-btn::after {
+            content: " ›";
+            transition: transform 0.3s ease;
+        }
+        
+        .shop-btn:hover::after {
+            animation: arrowMove 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes arrowMove {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(3px); }
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .hero::-webkit-scrollbar {
+            display: none;
+        }
+        .hero {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Custom chasing cursor */
+        .custom-cursor {
+            position: fixed;
+            width: 32px;
+            height: 32px;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24'><path d='M3 2l8.5 8.5L8 11l2 7-2.2-.9L6 14l-3 2V2z' fill='%23ffffff' stroke='%23000000' stroke-width='1' stroke-linejoin='round'/></svg>");
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-position: top left;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Keep default cursor visible */
+        body { cursor: auto; }
+
+        /* Shop item hover effects */
+        .shop-item:hover .shop-img {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+        
+        /* Shop item image data attributes */
+        .shop-img {
+            transition: opacity 0.3s ease;
+        }
+        
+        .shop-img.hover-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+        }
+        
+        .shop-item:hover .shop-img.hover-img {
+            opacity: 1;
+        }
+        
+        .shop-item:hover .shop-img:not(.hover-img) {
+            opacity: 0;
+        }
+
+        /* Shop item detail gallery */
+        .item-gallery-wrap {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 16px;
+            min-width: 0;
+        }
+        #item-gallery-container {
+            cursor: pointer;
+            flex: 1;
+            min-width: 0;
+            position: relative;
+        }
+        #nav-arrow {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 0;
+        }
+        #nav-arrow .nav-arrow-gallery-svg {
+            width: min(11vw, 70px);
+            height: auto;
+            display: block;
+            transform-origin: 50% 50%;
+        }
+        .nav-back-arrow-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 0;
+        }
+        .nav-back-arrow-link img {
+            width: 28px;
+            height: 28px;
+            display: block;
+            opacity: 0.4;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transform: scale(1);
+            transform-origin: center center;
+        }
+        .nav-back-arrow-link:hover img {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+        #gallery-numbers {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+            font-size: 12px;
+            color: #000;
+            letter-spacing: normal;
+            padding-top: 4px;
+        }
+        #gallery-numbers span {
+            display: block;
+            line-height: 1.2;
+        }
+        .shop-item-detail-copy {
+            max-width: 28em;
+        }
+        .item-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        #item-title {
+            font-size: 16pt;
+            font-weight: 400;
+            letter-spacing: normal;
+            margin: 0;
+            flex: 1;
+            min-width: 0;
+            line-height: 1.15;
+            text-align: left;
+        }
+        #item-price {
+            font-size: 14pt;
+            font-weight: 400;
+            letter-spacing: normal;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        #item-description {
+            font-size: 9pt;
+            line-height: 1.65;
+            margin-bottom: 0;
+            padding-bottom: 16px;
+            margin-top: 0;
+            border-bottom: 1px solid #e5e5e5;
+            font-variant: normal;
+            font-weight: 400;
+            letter-spacing: normal;
+        }
+        #item-material {
+            margin-top: 16px;
+        }
+
+        #detail-image {
+            opacity: 1;
+            transition: opacity 0.22s ease;
+        }
+
+        .center-title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(32px, 8vw, 96px);
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: #000;
+            text-transform: uppercase;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        /* Cart Overlay */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: none;
+        }
+
+        .cart-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 420px;
+            height: 100vh;
+            background: #fff;
+            z-index: 2001;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-header {
+            padding: 30px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-header h2 {
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .cart-close {
+            cursor: pointer;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 30px;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .cart-item-image {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            cursor: pointer;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-size {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .cart-item-price {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .quantity-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid #000;
+            width: fit-content;
+        }
+
+        .quantity-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #fff;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: background 0.2s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .quantity-value {
+            font-size: 14px;
+            min-width: 30px;
+            text-align: center;
+            padding: 0 8px;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+        }
+
+        .remove-btn {
+            font-size: 12px;
+            text-decoration: underline;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .cart-footer {
+            padding: 30px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .shipping-info {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .cart-summary {
+            margin-bottom: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .summary-label {
+            font-weight: 500;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 15px;
+            background: #000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .payment-icons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .payment-icon {
+            font-size: 20px;
+        }
+
+        .view-cart-link {
+            font-size: 12px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        /* Okhra Project Grid */
+        .okhra-grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            border-top: 1px solid #e5e5e5;
+            border-left: 1px solid #e5e5e5;
+        }
+
+        .okhra-grid-item {
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            border-right: 1px solid #e5e5e5;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .okhra-grid-item:hover {
+            opacity: 0.95;
+        }
+
+        .okhra-grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .okhra-text-section {
+            padding: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            font-size: 16px;
+            line-height: 1.8;
+            text-align: center;
+            border-right: 1px solid #e5e5e5;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .project-preview-card {
+            position: relative;
+            cursor: pointer;
+            height: 400px;
+            overflow: hidden;
+        }
+
+        .project-preview-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .project-preview-title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 32px;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-align: center;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 0 20px;
+                height: 60px;
+            }
+            .hero {
+                margin-top: 40px;
+                height: calc(100vh - 60px);
+            }
+            .hero.hero-shop-gallery {
+                height: min(75vh, 640px);
+                margin-top: 40px;
+            }
+            .hero-inner { gap: 10px; padding: 20px; }
+
+            .nav-left {
+                gap: 20px;
+            }
+
+            .nav-item,
+            .contact-link {
+                font-size: 14px;
+            }
+
+            .logo {
+                font-size: 22px;
+                letter-spacing: 0.14em;
+            }
+
+            .home-vertical {
+                margin-top: 60px;
+            }
+
+            .plans-screen {
+                margin-top: 60px;
+                padding: 28px 30px 60px;
+            }
+
+            .home-row {
+                grid-template-columns: 1fr;
+                min-height: unset;
+            }
+
+            .home-half {
+                min-height: 52vh;
+            }
+
+            .project-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+                min-height: calc(100vh - 60px);
+            }
+            .project-layout-image {
+                min-height: 42vh;
+                border-right: none;
+                border-bottom: 1px solid #e5e5e5;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-left {
+                gap: 15px;
+            }
+
+            .nav-item,
+            .contact-link {
+                font-size: 12px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+        }
+
+        /* Pre-site intro: dim site behind; white panel inset 50px from viewport */
+        #intro-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10001;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 50px;
+            cursor: pointer;
+            opacity: 1;
+            transition: opacity 0.65s ease;
+        }
+        @media (max-width: 700px), (max-height: 560px) {
+            #intro-overlay {
+                padding: min(50px, 5vw);
+            }
+        }
+        @media (max-width: 480px) {
+            #intro-overlay {
+                padding: 16px;
+            }
+        }
+        #intro-overlay.intro-fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .intro-card {
+            background: transparent;
+            flex: 0 1 auto;
+            width: fit-content;
+            max-width: 100%;
+            box-sizing: border-box;
+            padding: 0;
+            overflow: visible;
+            max-height: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            box-shadow: none;
+            cursor: pointer;
+        }
+        .intro-shop-image {
+            display: block;
+            width: min(960px, 92vw);
+            height: auto;
+            max-height: 86vh;
+            object-fit: contain;
+        }
+        .intro-enter-hint {
+            position: fixed;
+            left: 0;
+            top: 0;
+            transform: translate(14px, 14px);
+            color: #fff;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            text-transform: lowercase;
+            pointer-events: none;
+            opacity: 0.95;
+            z-index: 10002;
+            display: none;
+        }
+        .intro-text-block {
+            width: min(50vw, 720px);
+            max-width: 100%;
+            margin: 0;
+            text-align: left;
+        }
+        .intro-read-label {
+            margin: 0 0 50px 20px;
+            padding: 0;
+            text-align: left;
+            line-height: 0;
+        }
+        .intro-read-label img {
+            display: block;
+            width: min(120px, 26vw);
+            height: auto;
+            max-width: 100%;
+        }
+        .intro-copy {
+            font-size: 11pt;
+            line-height: 1.65;
+            font-weight: 700;
+            letter-spacing: normal;
+            color: #000;
+            font-variant: normal;
+            width: calc(100% - 100px);
+            max-width: none;
+            margin: 0 0 0 100px;
+            box-sizing: border-box;
+            column-count: 1;
+            column-gap: clamp(0.625rem, 2vw, 1.25rem);
+            column-fill: balance;
+        }
+        @media (max-width: 720px) {
+            .intro-text-block {
+                width: 100%;
+                max-width: 100%;
+            }
+            .intro-copy {
+                column-count: 1;
+                margin-left: 20px;
+                width: calc(100% - 20px);
+            }
+            .intro-read-label {
+                margin-left: 20px;
+            }
+        }
+        @media (max-width: 900px) {
+            .intro-card {
+                padding: 28px min(100px, 20px) min(100px, 40px) 0;
+            }
+        }
+        .intro-copy p {
+            margin: 0;
+            text-align: left;
+        }
+        .intro-copy p + p {
+            margin-top: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div id="intro-overlay" role="dialog" aria-modal="true" aria-label="Project introduction">
+        <div class="intro-card">
+            <img class="intro-shop-image" src="about/shop/shop_text.png" alt="Shop note">
+        </div>
+        <div id="intro-cursor-hint" class="intro-enter-hint">click to enter</div>
+    </div>
+
+    <!-- Fixed Top Navigation Bar -->
+    <nav class="top-bar">
+        <!-- Left Navigation -->
+        <div class="nav-left">
+            <div class="nav-item-dropdown">
+                <a href="#" class="nav-item" onclick="return false;">Project</a>
+                <div class="nav-dropdown-menu" aria-label="Project submenu">
+                    <a href="#" class="nav-dropdown-item" onclick="goToInterior(); return false;">interior</a>
+                    <a href="#" class="nav-dropdown-item" onclick="goToTerrain(); return false;">landscape</a>
+                    <a href="#" class="nav-dropdown-item" onclick="goToPlans(); return false;">plans</a>
+                </div>
+            </div>
+            <a href="#" class="nav-item" onclick="goToAbout(); return false;">ABOUT</a>
+            <a href="#" class="nav-item" onclick="goToShop(); return false;">Shop</a>
+        </div>
+
+        <!-- Center Logo/Headline -->
+        <a href="#" class="logo" onclick="goToHome(); return false;" aria-label="COSA home">
+            <img src="svg/okhra_cosa_new_white.png" alt="COSA">
+        </a>
+
+        <!-- Right Navigation -->
+        <div class="nav-right">
+            <a href="#" class="contact-link" onclick="toggleCart(); return false;">Cart (<span id="cart-count">0</span>)</a>
+        </div>
+    </nav>
+
+    <!-- Home Screen -->
+    <div id="home-screen" class="home-screen-layout" style="background: #fff;">
+        <section class="home-first-images" aria-label="Home first images">
+            <img id="home-first-slideshow-image" src="HOUSE_SMALL/selection-12.jpg" alt="Home slideshow">
+        </section>
+    </div>
+
+    <!-- Terrain page -->
+    <div id="terrain-screen" class="terrain-screen" style="display: none;">
+        <a href="#" onclick="handleTerrainBack(); return false;" class="nav-back-arrow-link" style="position: relative; top: 0; margin-bottom: 30px; text-decoration: none; padding: 4px 0; display: inline-block;" aria-label="Back"><img src="svg/navigation-back-arrow-svgrepo-com.svg" alt="" width="28" height="28"></a>
+        <div class="terrain-page-wrap">
+            <div class="terrain-page-grid">
+                <div class="terrain-hero-stack" id="terrain-hero-stack" title="Click to open focus view" onclick="openTerrainTopFocus(); return false;">
+                    <img class="terrain-hero-base" src="terrain_3d/terrain_trnsparent.png" alt="Terrain 3D">
+                    <img class="terrain-hero-overlay" src="terrain_3d/terrain_marked_main.png" alt="Terrain site map annotated">
+                </div>
+                <div class="terrain-plan-stack" id="terrain-plan-stack" title="Click to open focus view" onclick="openTerrainTopFocus(); return false;">
+                    <img class="terrain-plan-base terrain-plan-img" src="architectural/Plano_transparent_crop.png" alt="Site plan">
+                    <img class="terrain-plan-overlay" src="architectural/Plano_transparent_overlay_crop.png" alt="">
+                </div>
+                <div class="terrain-stairs-stack" id="terrain-stairs-stack" title="Click to expand stairs view" onclick="this.classList.toggle('is-expanded'); updateTerrainExpandedState(); return false;">
+                    <img class="terrain-stairs-base" src="plans/stairs_1.jpg" alt="Stairs">
+                    <img class="terrain-stairs-hover" src="HOUSE_SMALL/house-small20.jpg" alt="">
+                    <div class="terrain-stairs-expand-row">
+                        <img src="HOUSE_SMALL/house-small20.jpg" alt="">
+                        <img src="HOUSE_SMALL/stairs.jpg" alt="Stairs">
+                    </div>
+                    <div class="terrain-stairs-meta">
+                        <p class="terrain-stairs-note">the stairs where made following the natural landscape considering wate flow directions. the borders are make out of sidewlak blocks that are filled with gravel. the zig-zagged stairs allow planting in the created niches. Erosion grass and other local species where planted along the sides.</p>
+                        <div class="terrain-stairs-meta-images" aria-label="Stairs sketches">
+                            <img src="plans/stairs_2.jpg" alt="Stairs sketch two">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="terrain-top-focus" class="terrain-top-focus" aria-label="Landscape focus view">
+                <img class="terrain-top-focus-left" src="terrain_3d/terrain_marked_main.png" alt="Terrain marked">
+                <img class="terrain-top-focus-right" src="architectural/Plano_transparent_overlay_crop.png" alt="Plano overlay">
+            </div>
+            <div class="terrain-bottom-row" aria-label="Site details">
+                <div class="terrain-category-flow">
+                <div class="terrain-bottom-fence">
+                    <button type="button" class="terrain-fence-btn" aria-expanded="false" aria-controls="terrain-fence-grid" title="Natural fence" onclick="toggleTerrainFenceGrid(this); return false;">
+                        <img src="terrain_3d/natural_fence.png" alt="Natural fence">
+                    </button>
+                    <p class="terrain-fence-intro" id="terrain-fence-intro">We chose to use a local method for the fence line&mdash;the branches of three varieties of propagable trees are used as cuttings (&ldquo;madero-negro&rdquo;). They are planted during full/empty moon around the month of May, in order to ensure success in growing into a lovely, dense, green fence.</p>
+                </div>
+                <div class="terrain-bottom-coco">
+                    <button type="button" class="terrain-coco-btn" aria-expanded="false" aria-controls="terrain-plants-grid" title="Toggle plants layout" onclick="toggleTerrainPlantsGrid(this); return false;">
+                        <img src="terrain_3d/coco_plants_title.png" alt="Plants">
+                    </button>
+                    <p class="terrain-plants-intro" id="terrain-plants-intro">These are some of the favorite plants and trees from the property. There are two massive guanacaste (the national Costa Rican tree), a corteza amarilla that blossoms with bright yellow flowers for three days around March, and roble sabana, an oakish tree that blossoms in pink. These are hardwoods and great for furniture making. Otherwise we planted fruit trees like mango, avocado, and lemon varieties. Another interesting plant is the cordyline (hoja-roja), locally used to mark borders due to its distinct pink. We planted and maintained many other local plants that attract butterflies and bees.</p>
+                </div>
+                <div class="terrain-bottom-terrace">
+                    <button type="button" class="terrain-terrace-btn" aria-expanded="false" aria-controls="terrain-terraces-grid" title="Toggle terraces" onclick="toggleTerrainTerracesGrid(this); return false;">
+                        <img src="terrain_3d/terraces/terrace_2.png" alt="Terraces">
+                    </button>
+                    <p class="terrain-terraces-intro" id="terrain-terraces-intro">In the terraced land we used a structure of plants that support the soil. The coconut trees are planted on the outline of each flat area each 10m; the &ldquo;vetiver&rdquo; is a high resistance erosion grass that holds the soil, and it is planted in a zig-zag, also called &ldquo;pata-gallina&rdquo; (chicken foot).</p>
+                </div>
+                <div class="terrain-terrace-left-tall" aria-label="Terrace large image">
+                    <img src="terrain_3d/terraces/terrases1.jpg" alt="">
+                </div>
+                <div class="terrain-bottom-insect">
+                    <div class="terrain-insect-stack" id="terrain-insect-stack">
+                        <button type="button" id="terrain-insect-12-btn" class="terrain-insect-12-btn" aria-expanded="false" aria-controls="terrain-insect-scatter" title="Open insect layout; click anywhere to collapse" onclick="document.getElementById('terrain-insect-stack').classList.add('is-expanded'); this.setAttribute('aria-expanded','true'); updateTerrainExpandedState(); return false;">
+                            <img src="terrain_3d/insect/insects_title.png" alt="Insects">
+                        </button>
+                        <div id="terrain-insect-scatter" class="terrain-insect-scatter" role="region" aria-label="Insect images">
+                            <img class="terrain-insect-pip terrain-insect-pip--1" src="terrain_3d/insect/insects_1.png" alt="" style="--x: 8; --y: 13;">
+                            <img class="terrain-insect-pip" src="terrain_3d/insect/insects_2.png" alt="" style="--x: 33; --y: 7;">
+                            <img class="terrain-insect-pip" src="terrain_3d/insect/insects_3.png" alt="" style="--x: 58; --y: 19;">
+                            <img class="terrain-insect-pip" src="terrain_3d/insect/insects_4.png" alt="" style="--x: 86; --y: 11;">
+                            <img class="terrain-insect-pip" src="terrain_3d/insect/insects_5.png" alt="" style="--x: 15; --y: 39;">
+                            <img class="terrain-insect-pip" src="terrain_3d/insect/insects_6.png" alt="" style="--x: 46; --y: 31;">
+                            <img class="terrain-insect-pip" src="terrain_3d/insect/insects_7.png" alt="" style="--x: 74; --y: 43;">
+                            <img class="terrain-insect-pip terrain-insect-pip--8" src="terrain_3d/insect/insects_8.png" alt="" style="--x: 93; --y: 35;">
+                            <img class="terrain-insect-pip" src="terrain_3d/insect/insects_9.png" alt="" style="--x: 22; --y: 61;">
+                            <img class="terrain-insect-pip" src="terrain_3d/insect/insects_10.png" alt="" style="--x: 51; --y: 70;">
+                            <img class="terrain-insect-pip terrain-insect-pip--11" src="terrain_3d/insect/insects_11.png" alt="" style="--x: 81; --y: 76;">
+                            <img class="terrain-insect-pip terrain-insect-pip--12" src="terrain_3d/insect/insects_12.png" alt="" title="Click anywhere to collapse" style="--x: 44; --y: 49;">
+                        </div>
+                    </div>
+                </div>
+            <div id="terrain-plants-grid" class="terrain-plants-grid" role="region" aria-label="Plant images">
+                <div class="terrain-plants-row" aria-label="Corteza amarilla and related">
+                    <span class="terrain-plants-row-label-wrap"><img class="terrain-plants-row-label" src="terrain_3d/plants/corteza_text.png" alt="Corteza text"></span>
+                    <img src="terrain_3d/plants/corteza-3.jpg" alt="">
+                    <img src="terrain_3d/plants/corteza_2-3.jpg" alt="">
+                    <img src="terrain_3d/plants/corteza5-3.jpg" alt="">
+                    <img src="terrain_3d/plants/corteza7-3.jpg" alt="">
+                </div>
+                <div class="terrain-plants-row" aria-label="Border plants, fruit trees, and coconut">
+                    <span class="terrain-plants-row-label-wrap"><img class="terrain-plants-row-label" src="terrain_3d/plants/plant_text.png" alt="Plants text"></span>
+                    <img src="terrain_3d/plants/plant_border-3.jpg" alt="">
+                    <img src="terrain_3d/plants/mango.jpg" alt="">
+                    <img src="terrain_3d/plants/avocado.jpg" alt="">
+                    <img src="terrain_3d/plants/plant_coco-3.jpg" alt="">
+                    <img src="terrain_3d/plants/plant_coco_2-3.jpg" alt="">
+                </div>
+                <div class="terrain-plants-row" aria-label="Guanacaste and cordyline">
+                    <img src="terrain_3d/plants/guanacaste.jpg" alt="">
+                    <img src="terrain_3d/plants/plant_guana-3.jpg" alt="">
+                    <img src="terrain_3d/plants/plant_redinspo-3.jpg" alt="">
+                </div>
+            </div>
+            <div id="terrain-fence-grid" class="terrain-fence-grid" role="region" aria-label="Natural fence images">
+                <img src="terrain_3d/fence/fence_natural1.jpg" alt="">
+                <img class="fence-inline-note" src="terrain_3d/fence/tree_cuttings.png" alt="">
+                <img src="terrain_3d/fence/fence_natural2.jpg" alt="">
+                <img class="fence-inline-note" src="terrain_3d/fence/heliconia.png" alt="">
+                <img src="terrain_3d/fence/fence_natural3.jpg" alt="">
+            </div>
+            <div id="terrain-terraces-grid" class="terrain-terraces-grid" role="region" aria-label="Terrace images">
+                <img src="terrain_3d/terraces/terrases.jpg" alt="">
+                <img src="terrain_3d/terraces/terrace_structure.png" alt="">
+                <img src="terrain_3d/terraces/terrases1.jpg" alt="">
+            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Screen -->
+    <div id="project-screen" style="display: none; background: #fff;">
+        <section id="about-fullbleed-hero" class="about-fullbleed-hero" aria-label="Project hero">
+            <img src="HOUSE_SMALL/selection_6_cover_dark.jpg.png" alt="COSA project cover">
+            <p class="about-fullbleed-overlay-copy"><span class="about-overlay-kicker">ABOUT</span><br>This project is an exploration making through living. I designed the space, built all the featured furniture, from the kitchen and doors down to the towel hangers. Most of the furniture is made out of leftover construction materials. this website was also designed by myself in order to present the project.</p>
+        </section>
+        <section class="about-project-copy" aria-label="Project description">
+            <p>The project came out of a need to explore the term "home." It started after traveling and eventually living in Costa Rica, which led to finding a property and developing the project from there. Over time, it became a way for me to learn the different sectors involved in designing a house, as well as my own position within them and within a larger system. Planning and sketching the house, approving the architectural plans in the municipality, working on the foundations with constructors, and eventually taking on most of the hands-on work to the extent of my ability. Around 90% of the materials used in the furniture objects were sourced from leftover construction materials, which shaped many of the decisions and details along the way.</p>
+        </section>
+        <section class="home-categories" aria-label="Project categories">
+            <div class="home-categories-item">
+                <h2 class="home-categories-title">architectural</h2>
+                <img src="architectural/house.png" alt="">
+            </div>
+            <div class="home-categories-item home-categories-item--link" role="button" tabindex="0" aria-label="Open terrain" onclick="goToTerrain(); return false;" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToTerrain();}">
+                <h2 class="home-categories-title">terrain</h2>
+                <img src="terrain_3d/terrain_trnsparent.png" alt="">
+            </div>
+            <div class="home-categories-item home-categories-item--link" role="button" tabindex="0" aria-label="Open shop" onclick="goToShop(); return false;" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToShop();}">
+                <h2 class="home-categories-title">furniture</h2>
+                <img src="furniture_product_trns/chair_1.png" alt="">
+            </div>
+        </section>
+    </div>
+
+    <!-- About Screen -->
+    <div id="about-screen" style="display: none; background: #fff; margin-top: 80px;">
+        <section class="about-project-copy" aria-label="Project description">
+            <div class="about-content-layout">
+                <div class="about-image-wrap">
+                    <img src="about/about_proccess.jpg" alt="House construction process">
+                </div>
+                <div class="about-content-text">
+                    <p class="about-right-lead">During the time I lived in the house, it functioned as a working studio and as a home in the process of becoming.</p>
+                    <p>I began this project as a personal search. While traveling in Central and South America, I was contemplating what “home” is, where I feel at home, and where I can have a sense of belonging. These questions continue to accompany me, and I believe the idea of home grows with a person's life. Living in Costa Rica and doing this project became part of that process, deepening my understanding of how different ideas and realities shape building a home. Trials, mistakes, and a long series of decisions shaped the final result.</p>
+                    <p>Being as involved as possible in the house’s design was important to me. I began with hand-drawn sketches, which evolved into architectural plans with a local architect. A contractor built the structural shell, then I managed the project with subcontractors. When the house was somewhat livable, I moved in and created from within. I did most of the interior work and furniture by hand. The house was built conventionally, but most furniture was made from leftover materials, which shaped both the design and the final furniture forms.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="interior-screen" class="interior-screen" style="display: none;">
+        <div class="interior-wrap">
+            <section class="interior-block" aria-label="living room">
+                <div class="interior-row">
+                    <img src="HOUSE_SMALL/selection-3.jpg" alt="Living room corridor">
+                    <div class="interior-paragraph-cell">
+                        <div class="interior-paragraph-stack">
+                            <h2 class="interior-title">living room</h2>
+                            <p>a large corridor leads you to the living room. It is the central space of the house and it was designed as an open area that allows for comfort and a connection to the outdoors. Above the glass vitrines, a pair of mashrabiyas enable continuous airflow through the corridor. The upper openings release hot air, and constant airflow maintains the space cool without the need of air-conditioning.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="interior-row-full">
+                    <img src="HOUSE_SMALL/selection-4.jpg" alt="Living room full view">
+                </div>
+                <div class="interior-row">
+                    <img src="HOUSE_SMALL/house-small11.jpg" alt="Living room detail">
+                    <img src="FURNITURE SMALL/furniture small1.jpg" alt="Living room furniture">
+                </div>
+            </section>
+
+            <section class="interior-block" aria-label="kitchen">
+                <div class="interior-row">
+                    <div class="interior-paragraph-cell">
+                        <div class="interior-paragraph-stack">
+                            <h2 class="interior-title">kitchen</h2>
+                            <p>The kitchen was the first element I built. It is connected to the living room, allowing the act of cooking to become social. It offers a variety of storage solutions and is highly functional.</p>
+                        </div>
+                    </div>
+                    <img src="okhra_project/selection_5.jpg" alt="Kitchen overview">
+                </div>
+                <div class="interior-row">
+                    <img src="okhra_project/selection_7.jpg" alt="Kitchen seating">
+                    <img src="FURNITURE SMALL/kitchen_handles.jpg" alt="Kitchen handles detail">
+                </div>
+            </section>
+
+            <section class="interior-block" aria-label="bathroom">
+                <div class="interior-row">
+                    <img src="HOUSE_SMALL/selection-10.jpg" alt="Bathroom sink">
+                    <div class="interior-paragraph-cell">
+                        <div class="interior-paragraph-stack">
+                            <h2 class="interior-title">bathroom</h2>
+                            <p>The bathroom is designed to connect with nature while maintaining privacy. An opening to the terrace allows constant ventilation, and a frosted window enables either enclosure or openness to the outside. The shower head directs water onto a curved metal surface supported by a concrete structure, allowing the water to fall freely. The sink is cast in concrete and incorporates a floating shelf made from leftover materials-wood and copper plumbing pipes.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="interior-row">
+                    <img src="HOUSE_SMALL/selection-9.jpg" alt="Bathroom kitchen-side view">
+                    <img src="HOUSE_SMALL/house-small18.jpg" alt="Bathroom wall detail">
+                </div>
+            </section>
+
+            <section class="interior-block" aria-label="bedroom">
+                <div class="interior-row">
+                    <div class="interior-paragraph-cell">
+                        <div class="interior-paragraph-stack">
+                            <h2 class="interior-title">bedroom</h2>
+                            <p>The sleeping areas are designed to allow privacy and function almost as autonomous units. The bedroom connects directly to the bathroom, while the glass facade opens to a covered private terrace. A passage between the terrace and the bathroom creates a circular flow within the room. The space forms an intimate alcove, in contrast to the open nature of the living area. Furniture and lighting are minimal, supporting rest and sleep.</p>
+                        </div>
+                    </div>
+                    <img src="okhra_project/selection_11.jpg" alt="Bedroom view">
+                </div>
+                <div class="interior-row">
+                    <img src="FURNITURE SMALL/wardrobe_edit.jpg" alt="Wardrobe">
+                    <img src="FURNITURE SMALL/spot_room.jpg" alt="Bedroom spot detail">
+                </div>
+            </section>
+
+            <section class="interior-block" aria-label="detail">
+                <h2 class="interior-title">detail</h2>
+                <p class="interior-detail-line">Little house features were made out of a combination of materials, from scrap wood to hand made ceramic hangers and objects from the local flea market.</p>
+                <div class="interior-row">
+                    <img src="FURNITURE SMALL/furniture small6.jpg" alt="Furniture detail six">
+                    <img src="FURNITURE SMALL/furniture small5.jpg" alt="Furniture detail five">
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Exterior Screen (placeholder) -->
+    <div id="exterior-screen" style="display: none; margin-top: 80px; padding: 40px 5% 80px; background: #fff;"></div>
+
+    <!-- Plans: drawings grid -->
+    <div id="plans-screen" class="plans-screen" style="display: none;">
+        <a href="#" onclick="handlePlansBack(); return false;" class="nav-back-arrow-link" style="position: relative; top: -10px; margin-bottom: 30px; text-decoration: none; padding: 4px 0; display: inline-block;" aria-label="Back"><img src="svg/navigation-back-arrow-svgrepo-com.svg" alt="" width="28" height="28"></a>
+        <div class="plans-grid" id="plans-grid" aria-label="Drawings"></div>
+    </div>
+
+    <!-- Shop Screen -->
+    <div id="shop-screen" style="display: none; margin-top: 80px; padding: 40px 5% 0; background: #fff;">
+        <a href="#" onclick="goToHome(); return false;" class="nav-back-arrow-link" style="position: relative; top: -10px; margin-bottom: 30px; text-decoration: none; padding: 4px 0;" aria-label="Back to home"><img src="svg/navigation-back-arrow-svgrepo-com.svg" alt="" width="28" height="28"></a>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;" id="shop-grid">
+        </div>
+        <section class="hero hero-shop-gallery" id="hero-scroll" aria-label="Home gallery">
+            <button type="button" id="shop-gallery-arrow-left" class="shop-gallery-arrow shop-gallery-arrow--left" aria-label="Scroll gallery left">
+                <img src="svg/navigation-back-arrow-svgrepo-com.svg" alt="">
+            </button>
+            <button type="button" id="shop-gallery-arrow-right" class="shop-gallery-arrow shop-gallery-arrow--right" aria-label="Scroll gallery right">
+                <img src="svg/navigation-back-arrow-svgrepo-com.svg" alt="">
+            </button>
+            <div class="hero-inner">
+                <div class="image-item">
+                    <img src="home/home_1.jpg" alt="Home 1">
+                    <button type="button" class="shop-btn" onclick="goToShopItem(6); return false;">SHOP</button>
+                </div>
+                <div class="image-item">
+                    <img src="home/home_2.jpg" alt="Home 2">
+                    <button type="button" class="shop-btn" onclick="goToShopItem(1); return false;">SHOP</button>
+                </div>
+                <div class="image-item">
+                    <img src="home/home_3.jpg" alt="Home 3">
+                    <button type="button" class="shop-btn" onclick="goToShopItem(2); return false;">SHOP</button>
+                </div>
+                <div class="image-item">
+                    <img src="home/home_4.jpg" alt="Home 4">
+                    <button type="button" class="shop-btn" onclick="goToShopItem(7); return false;">SHOP</button>
+                </div>
+                <div class="image-item">
+                    <img src="home/home_5.jpg" alt="Home 5">
+                    <button type="button" class="shop-btn" onclick="goToShopItem(3); return false;">SHOP</button>
+                </div>
+                <div class="image-item">
+                    <img src="home/home_6.jpg" alt="Home 6">
+                    <button type="button" class="shop-btn" onclick="goToShopItem(3); return false;">SHOP</button>
+                </div>
+                <div class="image-item">
+                    <img src="home/home_7.jpg" alt="Home 7">
+                    <button type="button" class="shop-btn" onclick="goToShopItem(8); return false;">SHOP</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Writing Screen removed -->
+
+    <!-- Full Screen Image Viewer -->
+    <div id="image-viewer" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); z-index: 3000; cursor: pointer;">
+        <div id="close-viewer" style="position: absolute; top: 30px; left: 30px; color: #fff; font-size: 48px; z-index: 3001; cursor: pointer; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">×</div>
+        <img id="viewer-image" src="" style="width: 100%; height: 100%; object-fit: contain;">
+    </div>
+
+    <!-- Shop Item Detail Screen -->
+    <div id="shop-item-detail-screen" style="display: none; margin-top: 80px; padding: 40px 5% 80px; background: #fff;">
+        <a href="#" onclick="goToShop(); return false;" class="nav-back-arrow-link" style="position: relative; top: -10px; margin-bottom: 30px; text-decoration: none; padding: 4px 0;" aria-label="Back to shop"><img src="svg/navigation-back-arrow-svgrepo-com.svg" alt="" width="28" height="28"></a>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; max-width: 1400px; margin: 0 auto; align-items: start;">
+            <div class="item-gallery-wrap">
+                <div id="item-gallery-container">
+                    <img id="detail-image" src="" style="width: 100%; height: auto; max-height: calc(100vh - 160px); object-fit: contain; cursor: pointer;">
+                    <div id="nav-arrow" style="position: absolute; top: 50%; transform: translateY(-50%); opacity: 0; pointer-events: none; transition: opacity 0.3s;"><img class="nav-arrow-gallery-svg" src="svg/navigation-back-arrow-svgrepo-com.svg" alt=""></div>
+                </div>
+                <div id="gallery-numbers" aria-label="Image index"></div>
+            </div>
+            <div class="shop-item-detail-copy">
+                <div class="item-title-row">
+                    <h1 id="item-title"></h1>
+                    <p id="item-price"></p>
+                </div>
+                <p id="item-description"></p>
+                <p id="item-material" style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px;"></p>
+                <p id="item-dimensions" style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 40px;"></p>
+                <button id="add-to-cart-btn" style="padding: 15px 60px; border: 1px solid #000; background: #000; color: #fff; cursor: pointer; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px;" onclick="addCurrentItemToCart()">ADD TO CART</button>
+                <p style="font-size: 12px; text-decoration: underline;">Free shipping on all orders*</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Screen -->
+    <div id="contact-screen" style="display: none; margin-top: 80px; padding: 80px 10%; text-align: center; background: #fff;">
+        <h1 style="font-size: 24px; font-weight: 400; letter-spacing: 0.18em; margin-bottom: 60px; text-align: center;">CONTACT</h1>
+        <div style="font-size: 14px; letter-spacing: 0.12em; line-height: 2;">
+            <a href="mailto:guykowen@gmail.com" style="color: #000; text-decoration: none;">guykowen@gmail.com</a> 
+            <span style="margin: 0 15px;">|</span>
+            <a href="https://instagram.com" target="_blank" style="color: #000; text-decoration: none;">instagram</a> 
+            <span style="margin: 0 15px;">|</span>
+            <a href="https://wa.me/" target="_blank" style="color: #000; text-decoration: none;">whatsapp</a>
+        </div>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()">
+        <div class="cart-panel" onclick="event.stopPropagation()">
+            <div class="cart-header">
+                <h2>Shopping Cart (<span id="cart-header-count">0</span>)</h2>
+                <div class="cart-close" onclick="toggleCart()">×</div>
+            </div>
+            <div class="cart-items" id="cart-items">
+                <!-- Cart items will be dynamically added here -->
+            </div>
+            <div class="cart-footer">
+                <div class="shipping-info">FREE SHIPPING ON ALL ORDERS*</div>
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span class="summary-label">SUBTOTAL</span>
+                        <span id="cart-subtotal">$0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">SHIPPING</span>
+                        <span>CALCULATED AT CHECKOUT</span>
+                    </div>
+                </div>
+                <button class="checkout-btn" onclick="processCheckout()">CHECK OUT →</button>
+                <div class="view-cart-link" onclick="toggleCart()">VIEW CART</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cart functionality
+        let cart = [];
+        let currentCartItem = null;
+
+        function toggleCart() {
+            const overlay = document.getElementById('cart-overlay');
+            if (overlay.style.display === 'none' || overlay.style.display === '') {
+                overlay.style.display = 'block';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+
+        function addCurrentItemToCart() {
+            if (!currentCartItem) return;
+            
+            const existingItem = cart.find(item => item.title === currentCartItem.title);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({
+                    title: currentCartItem.title,
+                    price: currentCartItem.price,
+                    image: currentCartItem.image,
+                    itemNum: currentCartItem.itemNum,
+                    quantity: 1
+                });
+            }
+            updateCartDisplay();
+            toggleCart();
+        }
+
+        function updateCartDisplay() {
+            const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').textContent = cartCount;
+            document.getElementById('cart-header-count').textContent = cartCount;
+            
+            const cartItems = document.getElementById('cart-items');
+            cartItems.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p style="text-align: center; padding: 40px;">Your cart is empty</p>';
+                document.getElementById('cart-subtotal').textContent = '$0';
+                return;
+            }
+            
+            let subtotal = 0;
+            
+            cart.forEach((item, index) => {
+                const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, ''));
+                subtotal += priceNum * item.quantity;
+                
+                const cartItemDiv = document.createElement('div');
+                cartItemDiv.className = 'cart-item';
+                cartItemDiv.innerHTML = `
+                    <img src="${item.image}" alt="${item.title}" class="cart-item-image" onclick="navigateToItem(${item.itemNum})">
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">${item.title}</div>
+                        <div class="cart-item-size">SIZE: One Size</div>
+                        <div class="cart-item-price">${item.price}</div>
+                        <div class="cart-item-controls">
+                            <div class="quantity-box">
+                                <button class="quantity-btn" onclick="decreaseQuantity(${index})">-</button>
+                                <span class="quantity-value">${item.quantity}</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(${index})">+</button>
+                            </div>
+                            <button class="remove-btn" onclick="removeFromCart(${index})">REMOVE</button>
+                        </div>
+                    </div>
+                `;
+                cartItems.appendChild(cartItemDiv);
+            });
+            
+            document.getElementById('cart-subtotal').textContent = '$' + subtotal.toFixed(2);
+        }
+
+        function increaseQuantity(index) {
+            cart[index].quantity++;
+            updateCartDisplay();
+        }
+
+        function decreaseQuantity(index) {
+            if (cart[index].quantity > 1) {
+                cart[index].quantity--;
+            } else {
+                cart.splice(index, 1);
+            }
+            updateCartDisplay();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartDisplay();
+        }
+
+        function navigateToItem(itemNum) {
+            toggleCart(); // Close cart
+            goToShopItem(itemNum); // Navigate to item detail page
+        }
+
+        function processCheckout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty');
+                return;
+            }
+
+            // Stripe publishable key - Replace with your actual key
+            const stripe = Stripe('pk_test_51QJxxxxxxxx'); // Replace with your Stripe publishable key
+            
+            // For demo purposes, we'll show an email input form first
+            const email = prompt('Please enter your email address:');
+            if (!email) return;
+
+            // Calculate total amount
+            let totalAmount = 0;
+            cart.forEach(item => {
+                const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, ''));
+                totalAmount += priceNum * item.quantity;
+            });
+
+            // In production, this would make a call to your backend to create a checkout session
+            // For now, we'll redirect to a simple payment page
+            const itemsSummary = cart.map(item => `${item.title} x${item.quantity}`).join(', ');
+            
+            alert(`Payment processing initiated!\n\nItems: ${itemsSummary}\nTotal: $${totalAmount.toFixed(2)}\n\nFor production, integrate with Stripe Checkout API or your payment processor.`);
+            
+            // Here you would typically:
+            // 1. Send cart data to your backend
+            // 2. Backend creates Stripe Checkout Session
+            // 3. Redirect user to Stripe Checkout
+            // Example:
+            // fetch('/create-checkout-session', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ cart, email })
+            // })
+            // .then(response => response.json())
+            // .then(data => {
+            //     stripe.redirectToCheckout({ sessionId: data.sessionId });
+            // });
+        }
+
+        // Navigation functions
+        function centerHomeHero() {
+            const hero = document.getElementById('hero-scroll');
+            if (!hero) return;
+            const firstItem = hero.querySelector('.image-item');
+            if (!firstItem || !firstItem.offsetWidth) return;
+            hero.scrollLeft = firstItem.offsetLeft - hero.offsetWidth / 2 + firstItem.offsetWidth / 2;
+        }
+
+        function syncShopGalleryArrowVisibility() {
+            const shopGallery = document.getElementById('hero-scroll');
+            const leftArrow = document.getElementById('shop-gallery-arrow-left');
+            const rightArrow = document.getElementById('shop-gallery-arrow-right');
+            if (!shopGallery || !leftArrow || !rightArrow) return;
+            const maxScroll = Math.max(0, shopGallery.scrollWidth - shopGallery.clientWidth);
+            const canScrollLeft = shopGallery.scrollLeft > 2;
+            const canScrollRight = shopGallery.scrollLeft < (maxScroll - 2);
+            leftArrow.dataset.canScroll = canScrollLeft ? '1' : '0';
+            rightArrow.dataset.canScroll = canScrollRight ? '1' : '0';
+            if (!canScrollLeft) leftArrow.classList.remove('is-active');
+            if (!canScrollRight) rightArrow.classList.remove('is-active');
+        }
+
+        function goToHome() {
+            closePlansStairsExpand();
+            document.getElementById('home-screen').style.display = 'block';
+            document.getElementById('project-screen').style.display = 'none';
+            document.getElementById('about-screen').style.display = 'none';
+            document.getElementById('interior-screen').style.display = 'none';
+            document.getElementById('exterior-screen').style.display = 'none';
+            document.getElementById('plans-screen').style.display = 'none';
+            document.getElementById('shop-screen').style.display = 'none';
+            document.getElementById('shop-item-detail-screen').style.display = 'none';
+            document.getElementById('terrain-screen').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            window.scrollTo(0, 0);
+            requestAnimationFrame(() => centerHomeHero());
+        }
+
+        function goToPlans() {
+            closePlansStairsExpand();
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('project-screen').style.display = 'none';
+            document.getElementById('about-screen').style.display = 'none';
+            document.getElementById('interior-screen').style.display = 'none';
+            document.getElementById('exterior-screen').style.display = 'none';
+            document.getElementById('plans-screen').style.display = 'block';
+            document.getElementById('shop-screen').style.display = 'none';
+            document.getElementById('shop-item-detail-screen').style.display = 'none';
+            document.getElementById('terrain-screen').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            window.scrollTo(0, 0);
+            initPlansGrid();
+        }
+
+        function goToProject() {
+            closePlansStairsExpand();
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('project-screen').style.display = 'block';
+            document.getElementById('about-screen').style.display = 'none';
+            document.getElementById('interior-screen').style.display = 'none';
+            document.getElementById('exterior-screen').style.display = 'none';
+            document.getElementById('plans-screen').style.display = 'none';
+            document.getElementById('shop-screen').style.display = 'none';
+            document.getElementById('shop-item-detail-screen').style.display = 'none';
+            document.getElementById('terrain-screen').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            window.scrollTo(0, 0);
+        }
+
+        function goToAbout() {
+            closePlansStairsExpand();
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('project-screen').style.display = 'none';
+            document.getElementById('about-screen').style.display = 'block';
+            document.getElementById('interior-screen').style.display = 'none';
+            document.getElementById('exterior-screen').style.display = 'none';
+            document.getElementById('plans-screen').style.display = 'none';
+            document.getElementById('shop-screen').style.display = 'none';
+            document.getElementById('shop-item-detail-screen').style.display = 'none';
+            document.getElementById('terrain-screen').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            window.scrollTo(0, 0);
+        }
+
+        let shopIntroShown = false;
+        let introDismissTarget = 'stay';
+
+        function openIntroOverlay(target) {
+            const intro = document.getElementById('intro-overlay');
+            const cursorHint = document.getElementById('intro-cursor-hint');
+            if (!intro) return;
+            introDismissTarget = target || 'stay';
+            intro.classList.remove('intro-fade-out');
+            intro.style.display = 'flex';
+            if (cursorHint) cursorHint.style.display = 'none';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function dismissIntroOverlay() {
+            const intro = document.getElementById('intro-overlay');
+            if (!intro || intro.style.display === 'none') return;
+            intro.classList.add('intro-fade-out');
+            setTimeout(() => {
+                intro.style.display = 'none';
+                if (introDismissTarget === 'shop') {
+                    goToShop(true);
+                } else if (introDismissTarget === 'home') {
+                    goToHome();
+                } else {
+                    document.body.style.overflow = 'auto';
+                }
+            }, 650);
+        }
+
+        function goToShop(skipIntro = false) {
+            if (!skipIntro && !shopIntroShown) {
+                shopIntroShown = true;
+                goToShop(true);
+                openIntroOverlay('stay');
+                return;
+            }
+            closePlansStairsExpand();
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('project-screen').style.display = 'none';
+            document.getElementById('about-screen').style.display = 'none';
+            document.getElementById('interior-screen').style.display = 'none';
+            document.getElementById('exterior-screen').style.display = 'none';
+            document.getElementById('plans-screen').style.display = 'none';
+            document.getElementById('shop-screen').style.display = 'block';
+            document.getElementById('shop-item-detail-screen').style.display = 'none';
+            document.getElementById('terrain-screen').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            window.scrollTo(0, 0);
+            requestAnimationFrame(() => centerHomeHero());
+            requestAnimationFrame(() => syncShopGalleryArrowVisibility());
+            setTimeout(() => centerHomeHero(), 200);
+        }
+
+        function goToInterior() {
+            closePlansStairsExpand();
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('project-screen').style.display = 'none';
+            document.getElementById('about-screen').style.display = 'none';
+            document.getElementById('interior-screen').style.display = 'block';
+            document.getElementById('exterior-screen').style.display = 'none';
+            document.getElementById('plans-screen').style.display = 'none';
+            document.getElementById('shop-screen').style.display = 'none';
+            document.getElementById('shop-item-detail-screen').style.display = 'none';
+            document.getElementById('terrain-screen').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            window.scrollTo(0, 0);
+        }
+
+        function goToExterior() {
+            closePlansStairsExpand();
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('project-screen').style.display = 'none';
+            document.getElementById('about-screen').style.display = 'none';
+            document.getElementById('interior-screen').style.display = 'none';
+            document.getElementById('exterior-screen').style.display = 'block';
+            document.getElementById('plans-screen').style.display = 'none';
+            document.getElementById('shop-screen').style.display = 'none';
+            document.getElementById('shop-item-detail-screen').style.display = 'none';
+            document.getElementById('terrain-screen').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            window.scrollTo(0, 0);
+        }
+
+        function collapseTerrainInsectExpand() {
+            const s = document.getElementById('terrain-insect-stack');
+            const b = document.getElementById('terrain-insect-12-btn');
+            if (s) s.classList.remove('is-expanded');
+            if (b) b.setAttribute('aria-expanded', 'false');
+            updateTerrainExpandedState();
+        }
+
+        function closeTerrainImageGalleries() {
+            const wrap = document.querySelector('#terrain-screen .terrain-page-wrap');
+            if (!wrap) return;
+            wrap.classList.remove('is-plants-open', 'is-terraces-open', 'is-fence-open', 'is-top-focus-open');
+            const cocoBtn = document.querySelector('.terrain-coco-btn');
+            const terraceBtn = document.querySelector('.terrain-terrace-btn');
+            const fenceBtn = document.querySelector('.terrain-fence-btn');
+            if (cocoBtn) cocoBtn.setAttribute('aria-expanded', 'false');
+            if (terraceBtn) terraceBtn.setAttribute('aria-expanded', 'false');
+            if (fenceBtn) fenceBtn.setAttribute('aria-expanded', 'false');
+            updateTerrainExpandedState();
+        }
+
+        function openTerrainTopFocus() {
+            const wrap = document.querySelector('#terrain-screen .terrain-page-wrap');
+            if (!wrap) return;
+            closeTerrainImageGalleries();
+            collapseTerrainInsectExpand();
+            const stairsStack = document.getElementById('terrain-stairs-stack');
+            if (stairsStack) stairsStack.classList.remove('is-expanded');
+            wrap.classList.add('is-top-focus-open');
+            updateTerrainExpandedState();
+        }
+
+        function setTerrainImageCategory(category) {
+            const wrap = document.querySelector('#terrain-screen .terrain-page-wrap');
+            if (!wrap) return;
+            wrap.classList.remove('is-plants-open', 'is-terraces-open', 'is-fence-open');
+            const cocoBtn = document.querySelector('.terrain-coco-btn');
+            const terraceBtn = document.querySelector('.terrain-terrace-btn');
+            const fenceBtn = document.querySelector('.terrain-fence-btn');
+            if (cocoBtn) cocoBtn.setAttribute('aria-expanded', 'false');
+            if (terraceBtn) terraceBtn.setAttribute('aria-expanded', 'false');
+            if (fenceBtn) fenceBtn.setAttribute('aria-expanded', 'false');
+            if (category === 'plants') {
+                wrap.classList.add('is-plants-open');
+                if (cocoBtn) cocoBtn.setAttribute('aria-expanded', 'true');
+            } else if (category === 'fence') {
+                wrap.classList.add('is-fence-open');
+                if (fenceBtn) fenceBtn.setAttribute('aria-expanded', 'true');
+            } else if (category === 'terraces') {
+                wrap.classList.add('is-terraces-open');
+                if (terraceBtn) terraceBtn.setAttribute('aria-expanded', 'true');
+            }
+            updateTerrainExpandedState();
+        }
+
+        function updateTerrainExpandedState() {
+            const screen = document.getElementById('terrain-screen');
+            const wrap = document.querySelector('#terrain-screen .terrain-page-wrap');
+            const insectOpen = !!document.getElementById('terrain-insect-stack')?.classList.contains('is-expanded');
+            const stairsOpen = !!document.getElementById('terrain-stairs-stack')?.classList.contains('is-expanded');
+            const topFocusOpen = !!(wrap && wrap.classList.contains('is-top-focus-open'));
+            const galleryOpen = !!(wrap && (
+                wrap.classList.contains('is-plants-open') ||
+                wrap.classList.contains('is-fence-open') ||
+                wrap.classList.contains('is-terraces-open')
+            ));
+            if (screen) {
+                const isExpanded = galleryOpen || insectOpen || stairsOpen || topFocusOpen;
+                screen.classList.toggle('terrain-screen--expanded', isExpanded);
+                document.body.style.overflow = isExpanded ? 'auto' : 'hidden';
+            }
+        }
+
+        function toggleTerrainPlantsGrid(buttonEl) {
+            const wrap = document.querySelector('#terrain-screen .terrain-page-wrap');
+            if (!wrap) return;
+            if (wrap.classList.contains('is-plants-open')) {
+                closeTerrainImageGalleries();
+            } else {
+                setTerrainImageCategory('plants');
+            }
+        }
+
+        function toggleTerrainTerracesGrid(buttonEl) {
+            const wrap = document.querySelector('#terrain-screen .terrain-page-wrap');
+            if (!wrap) return;
+            if (wrap.classList.contains('is-terraces-open')) {
+                closeTerrainImageGalleries();
+            } else {
+                setTerrainImageCategory('terraces');
+            }
+        }
+
+        function toggleTerrainFenceGrid(buttonEl) {
+            const wrap = document.querySelector('#terrain-screen .terrain-page-wrap');
+            if (!wrap) return;
+            if (wrap.classList.contains('is-fence-open')) {
+                closeTerrainImageGalleries();
+            } else {
+                setTerrainImageCategory('fence');
+            }
+        }
+
+        document.addEventListener('click', function terrainImageGalleryCloseOutside(e) {
+            const terrainScreen = document.getElementById('terrain-screen');
+            if (!terrainScreen || terrainScreen.style.display === 'none') return;
+            const wrap = terrainScreen.querySelector('.terrain-page-wrap');
+            if (!wrap) return;
+            const anyOpen = wrap.classList.contains('is-plants-open') || wrap.classList.contains('is-terraces-open') || wrap.classList.contains('is-fence-open') || wrap.classList.contains('is-top-focus-open');
+            if (!anyOpen) return;
+            const t = e.target;
+            if (t && t.closest && t.closest('.nav-back-arrow-link')) return;
+            if (t && t.closest && t.closest('.terrain-fence-btn, .terrain-coco-btn, .terrain-terrace-btn, #terrain-hero-stack, #terrain-plan-stack')) return;
+            closeTerrainImageGalleries();
+        }, true);
+
+        document.addEventListener('click', function terrainInsectCloseOnAnywhere(e) {
+            const stack = document.getElementById('terrain-insect-stack');
+            if (!stack || !stack.classList.contains('is-expanded')) return;
+            collapseTerrainInsectExpand();
+        }, true);
+
+        document.addEventListener('click', function terrainHeroMarkedUnlockOutside(e) {
+            const terrainScreen = document.getElementById('terrain-screen');
+            if (!terrainScreen || terrainScreen.style.display === 'none') return;
+            const heroStack = document.getElementById('terrain-hero-stack');
+            if (!heroStack || !heroStack.classList.contains('is-overlay-locked')) return;
+            if (heroStack.contains(e.target)) return;
+            heroStack.classList.remove('is-overlay-locked');
+        });
+
+        document.addEventListener('click', function terrainStackUnlockOutside(e) {
+            const terrainScreen = document.getElementById('terrain-screen');
+            if (!terrainScreen || terrainScreen.style.display === 'none') return;
+            const planStack = document.getElementById('terrain-plan-stack');
+            const stairsStack = document.getElementById('terrain-stairs-stack');
+            if (planStack && planStack.classList.contains('is-overlay-locked') && !planStack.contains(e.target)) {
+                planStack.classList.remove('is-overlay-locked');
+            }
+            if (stairsStack && stairsStack.classList.contains('is-expanded') && !stairsStack.contains(e.target)) {
+                stairsStack.classList.remove('is-expanded');
+                updateTerrainExpandedState();
+            }
+        });
+
+        (function initTerrainHeroStackClick() {
+            const stack = document.getElementById('terrain-hero-stack');
+            if (!stack) return;
+            stack.addEventListener('click', function terrainHeroStackClick(e) {
+                e.stopPropagation();
+                openTerrainTopFocus();
+            });
+        })();
+
+        function goToTerrain() {
+            closePlansStairsExpand();
+            const terrainStack = document.getElementById('terrain-hero-stack');
+            const planStack = document.getElementById('terrain-plan-stack');
+            const stairsStack = document.getElementById('terrain-stairs-stack');
+            collapseTerrainInsectExpand();
+            if (terrainStack) terrainStack.classList.remove('is-overlay-locked');
+            if (planStack) planStack.classList.remove('is-overlay-locked');
+            if (stairsStack) stairsStack.classList.remove('is-expanded');
+            closeTerrainImageGalleries();
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('project-screen').style.display = 'none';
+            document.getElementById('about-screen').style.display = 'none';
+            document.getElementById('interior-screen').style.display = 'none';
+            document.getElementById('exterior-screen').style.display = 'none';
+            document.getElementById('plans-screen').style.display = 'none';
+            document.getElementById('shop-screen').style.display = 'none';
+            document.getElementById('shop-item-detail-screen').style.display = 'none';
+            document.getElementById('terrain-screen').style.display = 'block';
+            document.body.style.overflow = 'auto';
+            window.scrollTo(0, 0);
+            updateTerrainExpandedState();
+        }
+
+        function handleTerrainBack() {
+            const wrap = document.querySelector('#terrain-screen .terrain-page-wrap');
+            const insectOpen = !!document.getElementById('terrain-insect-stack')?.classList.contains('is-expanded');
+            const galleryOpen = !!(wrap && (
+                wrap.classList.contains('is-plants-open') ||
+                wrap.classList.contains('is-fence-open') ||
+                wrap.classList.contains('is-terraces-open')
+            ));
+            const topFocusOpen = !!(wrap && wrap.classList.contains('is-top-focus-open'));
+            const terrainStack = document.getElementById('terrain-hero-stack');
+            const planStack = document.getElementById('terrain-plan-stack');
+            const stairsStack = document.getElementById('terrain-stairs-stack');
+            const overlayOpen = !!(
+                (terrainStack && terrainStack.classList.contains('is-overlay-locked')) ||
+                (planStack && planStack.classList.contains('is-overlay-locked')) ||
+                (stairsStack && stairsStack.classList.contains('is-expanded'))
+            );
+            if (galleryOpen || insectOpen || overlayOpen || topFocusOpen) {
+                closeTerrainImageGalleries();
+                collapseTerrainInsectExpand();
+                if (terrainStack) terrainStack.classList.remove('is-overlay-locked');
+                if (planStack) planStack.classList.remove('is-overlay-locked');
+                if (stairsStack) stairsStack.classList.remove('is-expanded');
+                updateTerrainExpandedState();
+                return;
+            }
+            goToHome();
+        }
+
+        function handlePlansBack() {
+            if (plansExpandedPairs.size > 0) {
+                closePlansStairsExpand();
+                return;
+            }
+            goToHome();
+        }
+
+        // Removed projects and contact screens; navigation now only switches
+        // between home, about, shop, and the shop item detail view.
+
+        let detailImageFadeToken = 0;
+
+        function detailImagePathsMatch(a, b) {
+            if (!a || !b) return false;
+            const na = String(a).split('?')[0];
+            const nb = String(b).split('?')[0];
+            return na === nb || na.endsWith(nb) || nb.endsWith(na);
+        }
+
+        function setShopDetailImageWithFade(src) {
+            const img = document.getElementById('detail-image');
+            if (!img || !src) return;
+            const cur = img.getAttribute('src') || '';
+            if (cur && detailImagePathsMatch(cur, src)) return;
+
+            const outMs = 180;
+            const inMs = 260;
+            const token = ++detailImageFadeToken;
+
+            const fadeIn = () => {
+                if (token !== detailImageFadeToken) return;
+                img.style.transition = 'opacity ' + inMs + 'ms ease';
+                requestAnimationFrame(() => {
+                    if (token !== detailImageFadeToken) return;
+                    img.style.opacity = '1';
+                });
+            };
+
+            const swapAndFadeIn = () => {
+                if (token !== detailImageFadeToken) return;
+                const onLoad = () => {
+                    if (token !== detailImageFadeToken) return;
+                    fadeIn();
+                    img.removeEventListener('load', onLoad);
+                };
+                img.addEventListener('load', onLoad, { once: true });
+                img.src = src;
+                if (img.complete && img.naturalWidth > 0) {
+                    img.removeEventListener('load', onLoad);
+                    requestAnimationFrame(() => {
+                        if (token !== detailImageFadeToken) return;
+                        fadeIn();
+                    });
+                }
+            };
+
+            if (!cur) {
+                img.style.transition = 'none';
+                img.style.opacity = '0';
+                img.src = src;
+                const show = () => {
+                    if (token !== detailImageFadeToken) return;
+                    img.style.transition = 'opacity ' + inMs + 'ms ease';
+                    requestAnimationFrame(() => {
+                        if (token !== detailImageFadeToken) return;
+                        img.style.opacity = '1';
+                    });
+                };
+                img.addEventListener('load', show, { once: true });
+                if (img.complete && img.naturalWidth > 0) requestAnimationFrame(show);
+                return;
+            }
+
+            img.style.transition = 'opacity ' + outMs + 'ms ease';
+            img.style.opacity = '0';
+            setTimeout(() => {
+                if (token !== detailImageFadeToken) return;
+                swapAndFadeIn();
+            }, outMs);
+        }
+
+        function goToProjectDetail(imageSrc, title) {
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('project-screen').style.display = 'none';
+            document.getElementById('about-screen').style.display = 'none';
+            document.getElementById('interior-screen').style.display = 'none';
+            document.getElementById('exterior-screen').style.display = 'none';
+            document.getElementById('plans-screen').style.display = 'none';
+            document.getElementById('shop-screen').style.display = 'none';
+            document.getElementById('terrain-screen').style.display = 'none';
+            document.getElementById('projects-screen').style.display = 'none';
+            document.getElementById('contact-screen').style.display = 'none';
+            document.getElementById('shop-item-detail-screen').style.display = 'none';
+            
+            setShopDetailImageWithFade(imageSrc);
+            document.getElementById('detail-title').textContent = title;
+        }
+
+        function goToShopItem(itemNum) {
+            closePlansStairsExpand();
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('project-screen').style.display = 'none';
+            document.getElementById('about-screen').style.display = 'none';
+            document.getElementById('interior-screen').style.display = 'none';
+            document.getElementById('exterior-screen').style.display = 'none';
+            document.getElementById('plans-screen').style.display = 'none';
+            document.getElementById('shop-screen').style.display = 'none';
+            document.getElementById('terrain-screen').style.display = 'none';
+            document.getElementById('shop-item-detail-screen').style.display = 'block';
+            document.body.style.overflow = 'auto';
+            window.scrollTo(0, 0);
+
+            const itemData = shopItems[itemNum - 1];
+            window.currentItemImages = itemData.allImgs.map(img =>
+                img.includes('/') ? img : `furniture_product_trns/${img}`
+            );
+            window.currentItemIndex = 0;
+            
+            setShopDetailImageWithFade(window.currentItemImages[0]);
+            document.getElementById('item-title').textContent = itemData.title;
+            document.getElementById('item-price').textContent = itemData.price;
+            document.getElementById('item-description').textContent = itemData.description || '';
+            document.getElementById('item-material').textContent = itemData.material ? `MATERIAL: ${itemData.material}` : '';
+            document.getElementById('item-dimensions').textContent = itemData.dimensions ? `DIMENSIONS: ${itemData.dimensions}` : '';
+            
+            // Set current cart item
+            currentCartItem = {
+                title: itemData.title,
+                price: itemData.price,
+                image: window.currentItemImages[0],
+                itemNum: itemNum
+            };
+            
+            // Reset gallery index
+            currentGalleryIndex = 0;
+            
+            document.getElementById('gallery-numbers').innerHTML =
+                renderGalleryNumberSpans(window.currentItemImages.length, 0);
+        }
+
+        function renderGalleryNumberSpans(total, activeIndex) {
+            let html = '';
+            for (let i = 1; i <= total; i++) {
+                const fontWeight = i === activeIndex + 1 ? 'bold' : 'normal';
+                const textDecoration = i === activeIndex + 1 ? 'underline' : 'none';
+                html += `<span style="font-weight: ${fontWeight}; text-decoration: ${textDecoration};">${i}</span>`;
+            }
+            return html;
+        }
+
+        // Okhra Project Setup
+        let okhraImages = [];
+        let currentImageViewerIndex = 0;
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function initOkhraProject() {
+            const images = [
+                'selection_1.jpg', 'selection_2.jpg', 'selection_3.jpg', 'selection_4.jpg',
+                'selection_5.jpg', 'selection_6.jpg', 'selection_7.jpg', 'selection_8.jpg',
+                'selection_9.jpg', 'selection_10.jpg', 'selection_11.jpg', 'selection_12.jpg'
+            ];
+            
+            // Keep images in fixed order, no shuffling
+            okhraImages = images;
+            const grid = document.getElementById('okhra-grid');
+            grid.innerHTML = '';
+            grid.style.display = 'grid';
+            grid.className = 'okhra-grid-container';
+            
+            let imageIndex = 0;
+            
+            function createImage(index, spanCol = 1, spanRow = 1) {
+                const div = document.createElement('div');
+                div.className = 'okhra-grid-item';
+                div.onclick = () => openImageViewer(index);
+                div.style.gridColumn = `span ${spanCol}`;
+                div.style.gridRow = `span ${spanRow}`;
+                div.innerHTML = `<img src="okhra_project/${okhraImages[index]}" alt="Okhra ${index + 1}">`;
+                return div;
+            }
+            
+            function createTextBlock(spanCol = 1, spanRow = 1) {
+                const div = document.createElement('div');
+                div.className = 'okhra-text-section';
+                div.style.gridColumn = `span ${spanCol}`;
+                div.style.gridRow = `span ${spanRow}`;
+                div.innerHTML = '设计工作室致力于创造美丽、可持续的家具。我们通过重新设计、精心修复和不断创新，将过去与现代重新连接。每一件作品都体现了我们对工艺、材料和可持续发展的承诺。';
+                return div;
+            }
+            
+            // Create masonry puzzle layout with 4 columns
+            grid.appendChild(createImage(imageIndex++, 2, 2)); // Large image spanning 2x2
+            grid.appendChild(createImage(imageIndex++, 1, 1));
+            grid.appendChild(createImage(imageIndex++, 1, 1));
+            grid.appendChild(createImage(imageIndex++, 1, 1));
+            
+            grid.appendChild(createImage(imageIndex++, 1, 1));
+            grid.appendChild(createImage(imageIndex++, 1, 1));
+            grid.appendChild(createTextBlock(2, 1)); // Text block spanning 2 columns (switched with selection_7)
+            grid.appendChild(createImage(imageIndex++, 1, 1)); // selection_7
+            
+            grid.appendChild(createImage(imageIndex++, 1, 1)); // selection_8
+            grid.appendChild(createImage(imageIndex++, 1, 1));
+            grid.appendChild(createImage(imageIndex++, 1, 1));
+            
+            grid.appendChild(createImage(imageIndex++, 1, 1));
+            grid.appendChild(createTextBlock(3, 1)); // Text block spanning 3 columns
+            
+            // Any remaining images
+            while (imageIndex < okhraImages.length) {
+                grid.appendChild(createImage(imageIndex++, 1, 1));
+            }
+        }
+
+        function initProjectsPreview() {
+            // Preview removed: projects go straight to Okhra grid
+            const previewGrid = document.getElementById('projects-preview');
+            if (previewGrid) previewGrid.innerHTML = '';
+        }
+
+        function openImageViewer(index) {
+            currentImageViewerIndex = index;
+            const viewer = document.getElementById('image-viewer');
+            const viewerImage = document.getElementById('viewer-image');
+                const imagePath = `okhra_project/${okhraImages[index]}`;
+            
+            viewerImage.src = imagePath;
+            viewer.style.display = 'block';
+            
+            // Add click listener to image for advancing
+            viewerImage.onclick = function(e) {
+                e.stopPropagation();
+                nextImage();
+            };
+        }
+
+        function closeImageViewer() {
+            document.getElementById('image-viewer').style.display = 'none';
+        }
+
+        function nextImage() {
+            currentImageViewerIndex = (currentImageViewerIndex + 1) % okhraImages.length;
+            const viewerImage = document.getElementById('viewer-image');
+            const imagePath = `okhra_project/${okhraImages[currentImageViewerIndex]}`;
+            viewerImage.src = imagePath;
+        }
+
+        // Initialize image viewer interactions
+        document.getElementById('image-viewer').addEventListener('click', function(e) {
+            if (e.target.id === 'close-viewer') {
+                closeImageViewer();
+            } else if (e.target.id === 'viewer-image') {
+                nextImage();
+            }
+        });
+
+        const planImages = [
+            'stairs_1.jpg',
+            'stairs.jpg',
+            'kitchen_8.jpg',
+            'kitchen_1.jpg',
+            'kitchen_4.jpg',
+            'kitchen_6.jpg',
+            'sketch_kitchen_straight.jpg',
+            'curtains.jpg',
+            'spots-2.jpg',
+            'spots.jpg',
+            'shelve_toilet.jpg',
+            'shower_ceramics.jpg',
+            'showerhead.jpg',
+            'shower_window.jpg',
+            'door_frame_6.jpg',
+            'shelve_living.jpg',
+            'door_frame_1.jpg',
+            'living_sketch_1.jpg',
+            'pantry_storage_1.jpg',
+            'pantry_storage_2.jpg',
+            'toiletpaper.jpg',
+            'side_block.jpg',
+            'side_block_3.jpg',
+            'sofa.jpg',
+            'table.jpg',
+            'wardrobe_1.jpg',
+            'chair.jpg',
+            'guest_toilet.jpg',
+            'light_fixture.jpg',
+            'sketch_window.jpg',
+            'todo_4.jpg',
+            'todo_1.jpg',
+            'todo_2.jpg',
+            'todo_3.jpg',
+            'storage.jpg',
+            'vent_hight.jpg',
+            'т6_Page_05.jpg',
+            'side_block_1.jpg',
+            'floor.jpg',
+            'kitchen_10.jpg',
+            'living_sketch_2.jpg',
+            'pantry.jpg',
+            'stairs_2.jpg',
+            'door_frame_5.jpg',
+            'pantry_storage.jpg',
+            'kitchen_12.jpg',
+            'plan_6.jpg',
+            'kitchen_7.jpg'
+        ];
+        const plansRandomSketchStartFile = 'todo_4.jpg';
+        const plansRandomSketchEndFile = 'kitchen_7.jpg';
+
+        const PLANS_INTERACTIVE_PAIRS = {
+            'stairs_1.jpg': 'HOUSE_SMALL/house-small20.jpg',
+            'stairs.jpg': 'HOUSE_SMALL/stairs.jpg',
+            'kitchen_1.jpg': 'proccess_img/small/kitchen_2.jpg',
+            'kitchen_8.jpg': 'HOUSE_SMALL/selection-7.jpg',
+            'kitchen_10.jpg': 'plans/kitchen_9.jpg',
+            'kitchen_4.jpg': 'FURNITURE SMALL/kitchen_handles.jpg',
+            'kitchen_6.jpg': 'proccess_img/small/drawer.jpg',
+            'curtains.jpg': 'HOUSE_SMALL/selection-3.jpg',
+            'spots.jpg': 'proccess_img/small/spots_clay.jpg',
+            'spots-2.jpg': 'FURNITURE SMALL/spot_room.jpg',
+            'shelve_toilet.jpg': 'HOUSE_SMALL/selection-10.jpg',
+            'shower_ceramics.jpg': 'proccess_img/small/ceramic_layout.jpg',
+            'showerhead.jpg': 'proccess_img/small/showerhead.jpg',
+            'shower_window.jpg': 'proccess_img/small/window_option.jpg',
+            'door_frame_1.jpg': 'proccess_img/small/sliding_door.jpg',
+            'door_frame_6.jpg': 'HOUSE_SMALL/house-small6.jpg',
+            'living_sketch_1.jpg': 'HOUSE_SMALL/selection-4.jpg',
+            'side_block.jpg': 'FURNITURE SMALL/DSC05949.jpg',
+            'table.jpg': 'FURNITURE SMALL/furniture small20.jpg',
+            'wardrobe_1.jpg': 'proccess_img/small/wardrobe_3.jpg',
+            'chair.jpg': 'FURNITURE SMALL/furniture small10.jpg',
+            'guest_toilet.jpg': 'proccess_img/small/guest_toilet.jpg',
+            'shelve_living.jpg': 'proccess_img/small/house small11.jpg',
+            'light_fixture.jpg': 'proccess_img/small/Light_fabric2.jpg',
+            'sketch_window.jpg': 'proccess_img/small/plant_guana.jpg',
+            'sofa.jpg': 'proccess_img/small/sofa_night.jpg',
+            'pantry.jpg': 'proccess_img/small/storage_detail.jpg',
+            'pantry_storage_1.jpg': 'FURNITURE SMALL/storage_unit.jpg',
+            'pantry_storage_2.jpg': 'proccess_img/small/storage_detail.jpg',
+            'plan_6.jpg': 'proccess_img/small/storage_unit_3.jpg',
+            'storage.jpg': 'proccess_img/small/storage_unit.jpg',
+            'side_block_3.jpg': 'proccess_img/small/side_block.jpg',
+            'toiletpaper.jpg': 'proccess_img/small/toiletpaper_3.jpg'
+        };
+        const plansExpandedPairs = new Map();
+
+        function buildPlansHoverStack(baseFile) {
+            const sideFile = PLANS_INTERACTIVE_PAIRS[baseFile];
+            const wrap = document.createElement('div');
+            wrap.className = 'plans-hover-stack';
+            const baseImg = document.createElement('img');
+            baseImg.className = 'plans-hover-base';
+            baseImg.src = encodeURI(`plans/${baseFile}`);
+            baseImg.alt = 'Drawing';
+            const altImg = document.createElement('img');
+            altImg.className = 'plans-hover-alt';
+            altImg.src = encodeURI(sideFile);
+            altImg.alt = '';
+            wrap.appendChild(baseImg);
+            wrap.appendChild(altImg);
+            return wrap;
+        }
+
+        function buildPlansExpandRow(baseFile) {
+            const sideFile = PLANS_INTERACTIVE_PAIRS[baseFile];
+            const row = document.createElement('div');
+            row.className = 'plans-expand-row';
+            const leftImg = document.createElement('img');
+            leftImg.src = encodeURI(sideFile);
+            leftImg.alt = '';
+            const rightImg = document.createElement('img');
+            rightImg.src = encodeURI(`plans/${baseFile}`);
+            rightImg.alt = 'Drawing';
+            row.appendChild(leftImg);
+            row.appendChild(rightImg);
+            return row;
+        }
+
+        function getPlansGridColumnCount() {
+            if (window.matchMedia('(max-width: 480px)').matches) return 1;
+            if (window.matchMedia('(max-width: 900px)').matches) return 2;
+            return 4;
+        }
+
+        function applyPlansExpandedRowPlacement(cell, grid) {
+            if (!cell || !grid) return;
+            const cols = getPlansGridColumnCount();
+            const idx = Array.from(grid.children).indexOf(cell);
+            if (idx < 0) return;
+            const rowStart = Math.floor(idx / cols) + 1;
+            cell.style.gridRowStart = String(rowStart);
+            cell.style.gridColumn = '1 / -1';
+        }
+
+        function clearPlansExpandedRowPlacement(cell) {
+            if (!cell) return;
+            cell.style.gridRowStart = '';
+            cell.style.gridColumn = '';
+        }
+
+        function updatePlansPairOpenClass(grid) {
+            if (!grid) return;
+            grid.classList.toggle('plans-grid--pair-open', plansExpandedPairs.size > 0);
+        }
+
+        function onPlansStairsExpandEscape(e) {
+            if (e.key === 'Escape') closePlansStairsExpand();
+        }
+
+        function closePlansPairExpand(baseFile) {
+            const grid = document.getElementById('plans-grid');
+            if (!grid || !baseFile) return;
+            if (!plansExpandedPairs.has(baseFile)) return;
+
+            const baseCell = grid.querySelector(`.plans-grid-cell[data-plan-file="${baseFile}"]`);
+            if (baseCell) {
+                baseCell.classList.remove('plans-grid-cell--pair-expanded');
+                clearPlansExpandedRowPlacement(baseCell);
+                baseCell.innerHTML = '';
+                baseCell.appendChild(buildPlansHoverStack(baseFile));
+            }
+
+            plansExpandedPairs.delete(baseFile);
+            updatePlansPairOpenClass(grid);
+        }
+
+        function closePlansStairsExpand() {
+            const grid = document.getElementById('plans-grid');
+            if (!grid || !plansExpandedPairs.size) return;
+            const files = Array.from(plansExpandedPairs.keys());
+            files.forEach((baseFile) => closePlansPairExpand(baseFile));
+            document.removeEventListener('keydown', onPlansStairsExpandEscape);
+        }
+
+        function openPlansPairExpand(baseFile) {
+            const grid = document.getElementById('plans-grid');
+            if (!grid || !PLANS_INTERACTIVE_PAIRS[baseFile]) return;
+
+            Array.from(plansExpandedPairs.keys()).forEach((k) => {
+                if (k !== baseFile) closePlansPairExpand(k);
+            });
+            if (!plansExpandedPairs.size) {
+                document.removeEventListener('keydown', onPlansStairsExpandEscape);
+            }
+
+            const baseCell = grid.querySelector(`.plans-grid-cell[data-plan-file="${baseFile}"]`);
+            if (!baseCell) return;
+
+            baseCell.classList.add('plans-grid-cell--pair-expanded');
+            applyPlansExpandedRowPlacement(baseCell, grid);
+            baseCell.innerHTML = '';
+            baseCell.appendChild(buildPlansExpandRow(baseFile));
+            plansExpandedPairs.set(baseFile, { locked: true });
+            updatePlansPairOpenClass(grid);
+            document.addEventListener('keydown', onPlansStairsExpandEscape);
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    baseCell.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+                });
+            });
+        }
+
+        function initPlansGrid() {
+            const grid = document.getElementById('plans-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            const hiddenStartIndex = planImages.indexOf(plansRandomSketchStartFile);
+            const hiddenEndIndex = planImages.lastIndexOf(plansRandomSketchEndFile);
+            const hasHiddenRange = hiddenStartIndex >= 0 && hiddenEndIndex >= hiddenStartIndex;
+            const appendPlanCell = (file) => {
+                if (file === '__empty__') {
+                    return;
+                }
+                const cell = document.createElement('div');
+                cell.className = 'plans-grid-cell';
+                cell.dataset.planFile = file;
+
+                const interactiveSideFile = PLANS_INTERACTIVE_PAIRS[file] || '';
+                if (interactiveSideFile) {
+                    cell.classList.add('plans-grid-cell--interactive');
+                    cell.appendChild(buildPlansHoverStack(file));
+
+                    cell.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const pair = plansExpandedPairs.get(file);
+                        if (pair && pair.locked) {
+                            closePlansPairExpand(file);
+                            if (!plansExpandedPairs.size) {
+                                document.removeEventListener('keydown', onPlansStairsExpandEscape);
+                            }
+                            return;
+                        }
+                        openPlansPairExpand(file);
+                    });
+                } else {
+                    const img = document.createElement('img');
+                    img.src = encodeURI(`plans/${file}`);
+                    img.alt = 'Drawing';
+                    cell.appendChild(img);
+                }
+
+                grid.appendChild(cell);
+            };
+
+            if (!hasHiddenRange) {
+                planImages.forEach((file) => appendPlanCell(file));
+                return;
+            }
+
+            // Keep plans clean: omit the random-sketches hidden range entirely.
+            planImages.forEach((file, idx) => {
+                if (idx < hiddenStartIndex || idx > hiddenEndIndex) {
+                    appendPlanCell(file);
+                }
+            });
+        }
+        initPlansGrid();
+
+        // Dynamically generate shop items (excluding single-image items)
+        const shopItems = [
+            {
+                imgs: ['chair_1.png', 'FURNITURE SMALL/furniture small18.jpg'],
+                title: 'TWO chair',
+                price: '$320',
+                material: 'Costa Rican teak decking wood, pine plywood',
+                dimensions: 'H 76 / W 45 / D 40cm',
+                description: 'Two chair is made from Costa Rican teak decking wood and pine plywood. It is my first chair, and I was happy to sit on it.',
+                allImgs: ['chair_1.png', 'chair_2.png', 'chair_3.jpg', 'home/home_1.jpg']
+            },
+            {
+                imgs: ['bench_1.png', 'FURNITURE SMALL/furniture small15.jpg'],
+                title: 'BEAM bench',
+                price: '$470',
+                material: 'wengue wood',
+                dimensions: 'H 40 / W 140 / D 25cm',
+                description: 'Beam bench is an unknown beam that was found on the property. I was happy to finally have a different type of massive wood to have different options. It has an extreme rectangular wood joint.',
+                allImgs: ['bench_1.png', 'home/home_3.jpg', 'bench_3.jpg', 'bench_2.png']
+            },
+            {
+                imgs: ['pink_1.png', 'pink_4.jpg'],
+                title: 'DONKEY stool',
+                price: '$1,000,000',
+                material: 'unknown types of wood',
+                dimensions: 'H 50 / W 30 / D 30cm',
+                description: 'Donkey stool is made out of scrap wood, a fast-built, nailed construction using wood from concrete molds into a super functional stool. It was trashed and followed me along the entire build of the house, then I slapped a pink layer of heavy paint on it.',
+                allImgs: ['pink_1.png', 'pink_4.jpg', 'pink_3.jpg']
+            },
+            {
+                imgs: ['chair_O_1.png', 'FURNITURE SMALL/DSC05901.jpg'],
+                title: 'CHEERIO',
+                price: '$230',
+                material: 'pine wood',
+                dimensions: 'H 76 / W 45 / D 40cm',
+                description: 'Cheerio is an adult-size kids’ chair, made out of pine wood, heavily lacquered like a Cheerio in honey. It is made out of leftover wood.',
+                allImgs: ['chair_O_1.png', 'chair_O_3.jpg', 'chair_O_2.png', 'chair_4.jpg', 'okhra_project/selection_3.jpg']
+            },
+            {
+                imgs: ['standing_lamp_2.png', 'FURNITURE SMALL/furniture small13.jpg'],
+                title: 'HI standing lamp',
+                price: '$190',
+                material: 'stainless steel, ceramics, steel',
+                dimensions: 'H 165 / W 30 / D 30cm',
+                description: 'HI standing lamp is made out of scraps from a flea market (stainless pot top), a stainless curtain pole, and random metal scraps for footing.',
+                allImgs: ['standing_lamp_1.png', 'standing_lamp_2.png', 'standing_lamp_3.jpg', 'standing_lamp_4.jpg', 'standing_lamp_5.jpg']
+            },
+            {
+                imgs: ['table_1.png', 'FURNITURE SMALL/furniture small21.jpg'],
+                title: 'CROSS table',
+                price: '$650',
+                material: 'Costa Rican teak decking wood, pine plywood',
+                dimensions: 'H 76 / W 45 / D 40cm',
+                description: 'Cross table is a round table that is supported by a center cross. It is made from leftover Costa Rican teak decking wood and pine plywood.',
+                allImgs: ['table_1.png', 'table_2.png', 'table_3.jpg', 'okhra_project/selection_3.jpg']
+            },
+            {
+                imgs: ['sidelamp_1.png', 'FURNITURE SMALL/furniture small1.jpg'],
+                title: 'OVAL side lamp',
+                price: '$80',
+                material: 'scrap metal, decking wood',
+                dimensions: 'H 25 / W 25 / D 8cm',
+                description: 'Oval side lamp is a lump of scraps of metal and decking wood. It has a low light and acts as a candle-like filler.',
+                allImgs: ['sidelamp_1.png', 'sidelamp_2.png', 'sidelamp_4.jpg', 'sidelamp_3.jpg']
+            },
+            {
+                imgs: ['coffee_1.png', 'FURNITURE SMALL/coffee table.jpg'],
+                title: 'FRAMER table',
+                price: '$350',
+                material: 'pine wood',
+                dimensions: 'H 40 / W 45 / D 120cm',
+                description: 'Framer table was made from scrap pine wood from the kitchen I built. I was very limited by the pieces left since I had already used all the rest for other pieces of furniture. I laid out the random pieces to create the tabletop, framed them, and combined them into a low coffee table.',
+                allImgs: ['coffee_1.png', 'coffee table.jpg', 'coffee_3.jpg']
+            },
+            {
+                imgs: ['side_1.png', 'FURNITURE SMALL/furniture small23.jpg'],
+                title: 'SIDE BLOCK — side table',
+                price: '$245',
+                material: 'granite, plywood',
+                dimensions: 'H 76 / W 45 / D 40cm',
+                description: 'Side block is made from leftover kitchen granite and leftover plywood from the kitchen. It is a strange combination of materials. I like it because of the experience rather than the final result.',
+                allImgs: ['side_1.png', 'side_2.png', 'side_3.jpg', 'side_4.jpg']
+            }
+        ];
+
+        function shopHoverSrc(file) {
+            if (!file) return '';
+            if (file.includes('SMALL/')) return encodeURI(file);
+            return 'furniture_product_trns/' + file;
+        }
+
+        const shopGrid = document.getElementById('shop-grid');
+        shopItems.forEach((item, index) => {
+            const itemNum = index + 1;
+            const itemHTML = `
+                <div style="cursor: pointer;" onclick="goToShopItem(${itemNum})" class="shop-item" data-item="${itemNum}">
+                    <div style="position: relative; height: 400px; overflow: hidden; margin-bottom: 20px; background: #fff;">
+                        <img src="furniture_product_trns/${item.imgs[0]}" alt="Furniture" class="shop-img" style="width: 100%; height: 100%; object-fit: contain; display: block;">
+                        ${item.imgs[1] ? `<img src="${shopHoverSrc(item.imgs[1])}" alt="Furniture" class="shop-img hover-img" style="width: 100%; height: 100%; object-fit: contain; display: block;">` : ''}
+                    </div>
+                    <h3 style="font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-align: center; margin-bottom: 5px;">${item.title}</h3>
+                    <p style="font-size: 12px; text-align: center;" class="shop-info" data-price="${item.price}" data-material="${item.material}">${item.price}</p>
+                </div>
+            `;
+            shopGrid.insertAdjacentHTML('beforeend', itemHTML);
+        });
+
+        // Shop item hover effects
+        document.querySelectorAll('.shop-item').forEach(item => {
+            const infoElement = item.querySelector('.shop-info');
+            const price = infoElement.getAttribute('data-price');
+            const material = infoElement.getAttribute('data-material');
+            
+            if (infoElement && price && material) {
+                item.addEventListener('mouseenter', () => {
+                    infoElement.textContent = material;
+                });
+                
+                item.addEventListener('mouseleave', () => {
+                    infoElement.textContent = price;
+                });
+            }
+        });
+
+        // Shop item detail gallery navigation
+        let currentGalleryIndex = 0;
+
+        const galleryContainer = document.getElementById('item-gallery-container');
+        const navArrow = document.getElementById('nav-arrow');
+        const navArrowImg = navArrow ? navArrow.querySelector('.nav-arrow-gallery-svg') : null;
+        const detailImage = document.getElementById('detail-image');
+
+        if (galleryContainer && navArrow && navArrowImg) {
+            galleryContainer.addEventListener('mousemove', (e) => {
+                const rect = galleryContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const width = rect.width;
+                
+                navArrow.style.opacity = '1';
+                navArrow.style.pointerEvents = 'all';
+                
+                if (x < width / 2) {
+                    navArrowImg.style.transform = 'scaleX(1)';
+                    navArrow.style.left = '20px';
+                    navArrow.style.right = 'auto';
+                } else {
+                    navArrowImg.style.transform = 'scaleX(-1)';
+                    navArrow.style.right = '20px';
+                    navArrow.style.left = 'auto';
+                }
+            });
+
+            galleryContainer.addEventListener('mouseleave', () => {
+                navArrow.style.opacity = '0';
+                navArrow.style.pointerEvents = 'none';
+            });
+
+            galleryContainer.addEventListener('click', (e) => {
+                const rect = galleryContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const width = rect.width;
+                
+                if (!window.currentItemImages || window.currentItemImages.length === 0) return;
+                
+                if (x < width / 2) {
+                    // Navigate left
+                    currentGalleryIndex = (currentGalleryIndex - 1 + window.currentItemImages.length) % window.currentItemImages.length;
+                } else {
+                    // Navigate right
+                    currentGalleryIndex = (currentGalleryIndex + 1) % window.currentItemImages.length;
+                }
+                
+                setShopDetailImageWithFade(window.currentItemImages[currentGalleryIndex]);
+                
+                const numbers = document.getElementById('gallery-numbers');
+                numbers.innerHTML = renderGalleryNumberSpans(window.currentItemImages.length, currentGalleryIndex);
+            });
+        }
+
+        const shopGallery = document.getElementById('hero-scroll');
+        const shopGalleryArrowLeft = document.getElementById('shop-gallery-arrow-left');
+        const shopGalleryArrowRight = document.getElementById('shop-gallery-arrow-right');
+        const shopScreen = document.getElementById('shop-screen');
+        if (shopGallery && shopGalleryArrowLeft && shopGalleryArrowRight && shopScreen) {
+            const scrollStep = () => Math.max(420, Math.floor(shopGallery.clientWidth * 0.72));
+            const showArrowByCursorSide = (clientX) => {
+                syncShopGalleryArrowVisibility();
+                const showLeft = clientX < (window.innerWidth / 2);
+                shopGalleryArrowLeft.classList.remove('is-active');
+                shopGalleryArrowRight.classList.remove('is-active');
+                if (showLeft && shopGalleryArrowLeft.dataset.canScroll === '1') {
+                    shopGalleryArrowLeft.classList.add('is-active');
+                } else if (!showLeft && shopGalleryArrowRight.dataset.canScroll === '1') {
+                    shopGalleryArrowRight.classList.add('is-active');
+                }
+            };
+            const hideBothShopArrows = () => {
+                shopGalleryArrowLeft.classList.remove('is-active');
+                shopGalleryArrowRight.classList.remove('is-active');
+            };
+            const activeShopArrow = () => (
+                shopGalleryArrowLeft.classList.contains('is-active')
+                    ? shopGalleryArrowLeft
+                    : (shopGalleryArrowRight.classList.contains('is-active') ? shopGalleryArrowRight : null)
+            );
+            const showRightArrowWhenGalleryInView = () => {
+                if (shopScreen.style.display === 'none') return;
+                const rect = shopGallery.getBoundingClientRect();
+                const inView = rect.top < window.innerHeight && rect.bottom > 80;
+                if (!inView) return;
+                syncShopGalleryArrowVisibility();
+                if (shopGalleryArrowRight.dataset.canScroll === '1') {
+                    shopGalleryArrowLeft.classList.remove('is-active');
+                    shopGalleryArrowRight.classList.add('is-active');
+                }
+            };
+            shopGalleryArrowLeft.addEventListener('click', (e) => {
+                e.preventDefault();
+                shopGallery.scrollBy({ left: -scrollStep(), behavior: 'smooth' });
+            });
+            shopGalleryArrowRight.addEventListener('click', (e) => {
+                e.preventDefault();
+                shopGallery.scrollBy({ left: scrollStep(), behavior: 'smooth' });
+            });
+            shopScreen.addEventListener('mousemove', (e) => {
+                showArrowByCursorSide(e.clientX);
+            });
+            shopScreen.addEventListener('mouseleave', () => {
+                hideBothShopArrows();
+            });
+            shopGallery.addEventListener('click', (e) => {
+                if (e.target.closest('.shop-btn') || e.target.closest('.shop-gallery-arrow')) return;
+                const arrow = activeShopArrow();
+                if (!arrow) return;
+                if (arrow === shopGalleryArrowLeft) {
+                    shopGallery.scrollBy({ left: -scrollStep(), behavior: 'smooth' });
+                } else {
+                    shopGallery.scrollBy({ left: scrollStep(), behavior: 'smooth' });
+                }
+            });
+            shopGallery.addEventListener('scroll', () => {
+                syncShopGalleryArrowVisibility();
+            }, { passive: true });
+            window.addEventListener('scroll', showRightArrowWhenGalleryInView, { passive: true });
+            syncShopGalleryArrowVisibility();
+        }
+
+        // Center home hero on first image after images have dimensions (no smooth scroll)
+        window.addEventListener('load', () => {
+            centerHomeHero();
+            syncShopGalleryArrowVisibility();
+        });
+
+        // Home hero slideshow (selection 1-12)
+        (function initHomeFirstSlideshow() {
+            const slideshowImg = document.getElementById('home-first-slideshow-image');
+            if (!slideshowImg) return;
+            const slideshowImages = [
+                'HOUSE_SMALL/selection-12.jpg',
+                'HOUSE_SMALL/selection-6.jpg',
+                'HOUSE_SMALL/selection-1.jpg',
+                'HOUSE_SMALL/selection-10.jpg',
+                'HOUSE_SMALL/selection-2.jpg',
+                'HOUSE_SMALL/selection-3.jpg',
+                'HOUSE_SMALL/selection-4.jpg',
+                'HOUSE_SMALL/selection-5.jpg',
+                'HOUSE_SMALL/selection-7.jpg',
+                'HOUSE_SMALL/selection-8.jpg',
+                'HOUSE_SMALL/selection-9.jpg',
+                'HOUSE_SMALL/selection-11.jpg'
+            ].map((p) => encodeURI(p));
+            let index = 0;
+            slideshowImg.src = slideshowImages[index];
+            setInterval(() => {
+                index = (index + 1) % slideshowImages.length;
+                slideshowImg.style.opacity = '0';
+                setTimeout(() => {
+                    slideshowImg.src = slideshowImages[index];
+                    slideshowImg.style.opacity = '1';
+                }, 350);
+            }, 4000);
+        })();
+
+        // Minimal hover motion
+        document.querySelectorAll('.nav-item, .contact-link').forEach(link => {
+            link.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-1px)';
+            });
+            link.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Intro overlay now opens on first Shop entry, not on initial site load.
+        (function initIntroOverlay() {
+            const intro = document.getElementById('intro-overlay');
+            const cursorHint = document.getElementById('intro-cursor-hint');
+            if (intro) {
+                intro.style.display = 'none';
+                intro.addEventListener('click', () => dismissIntroOverlay());
+                intro.addEventListener('mousemove', (e) => {
+                    if (!cursorHint) return;
+                    cursorHint.style.display = 'block';
+                    cursorHint.style.left = e.clientX + 'px';
+                    cursorHint.style.top = e.clientY + 'px';
+                });
+                intro.addEventListener('mouseleave', () => {
+                    if (!cursorHint) return;
+                    cursorHint.style.display = 'none';
+                });
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') dismissIntroOverlay();
+                });
+            }
+            goToHome();
+        })();
+    </script>
+</body>
+</html>
