@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 262.2 51.33">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        font-family: FatFrank-Heavy, FatFrank;
+        font-size: 66.88px;
+        font-weight: 800;
+        letter-spacing: -.07em;
+      }
+
+      .cls-2 {
+        fill: #ffec00;
+        font-family: Terminal-Grotesque, 'Terminal Grotesque';
+        font-size: 21.94px;
+        letter-spacing: -.03em;
+      }
+    </style>
+  </defs>
+  <text class="cls-1" transform="translate(-1.34 47.22)"><tspan x="0" y="0">GOLDEN</tspan></text>
+  <text class="cls-2" transform="translate(225.67 47.22)"><tspan x="0" y="0">pixel</tspan></text>
+</svg>

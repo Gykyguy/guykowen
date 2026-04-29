@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GOLDEN PIXEL</title>
+  <style>
+    :root {
+      --windows-blue: #0078d7;
+      --pixel-red: #ff0000;
+      --pixel-yellow: #ffd800;
+      --sidebar-bg: #ffffff;
+      --thumb-size: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--windows-blue);
+      height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      overflow: hidden;
+    }
+
+    .app {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+    }
+
+    .left-column {
+      width: 100px;
+      height: 100vh;
+      position: relative;
+      flex-shrink: 0;
+      overflow: visible;
+    }
+
+    .sidebar {
+      width: 100px;
+      height: calc(100vh - 160px);
+      margin-top: 160px;
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      padding: 6px 4px 8px;
+      gap: 0;
+      min-height: 0;
+    }
+
+    .sidebar-icons {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 2px;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 2px;
+      cursor: pointer;
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .icon-btn img {
+      object-fit: contain;
+      display: block;
+      filter: brightness(0) saturate(100%) invert(34%) sepia(99%) saturate(1460%) hue-rotate(184deg) brightness(96%) contrast(101%);
+    }
+
+    .icon-btn:hover img {
+      filter: brightness(0) saturate(100%) invert(16%) sepia(99%) saturate(7251%) hue-rotate(1deg) brightness(97%) contrast(119%);
+    }
+
+    .icon-btn::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 6px;
+      background: var(--sidebar-bg);
+      color: var(--windows-blue);
+      border: 1px solid var(--windows-blue);
+      padding: 2px 4px;
+      font-size: 9px;
+      font-weight: 700;
+      font-family: sans-serif;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.12s linear;
+      transition-delay: 0.6s;
+      z-index: 3;
+    }
+
+    .icon-btn:hover::after {
+      opacity: 1;
+    }
+
+    #insentiveButton img,
+    #resetButton img {
+      width: 18px;
+      height: 18px;
+    }
+
+    #exportButton img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .pixel-slider-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 0;
+      width: 100%;
+      margin-top: 50px;
+    }
+
+    .slider-label {
+      font-size: 8pt;
+      font-weight: 700;
+      color: var(--windows-blue);
+      text-decoration: none;
+      line-height: 1;
+    }
+
+    .slider-label--top {
+      margin-bottom: 6px;
+    }
+
+    .slider-label--bottom {
+      margin-top: 6px;
+    }
+
+    .pixel-slider-wrap {
+      flex: none;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      min-height: 120px;
+      height: calc(100vh - 460px);
+    }
+
+    .pixel-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 36px;
+      height: 100%;
+      min-height: 120px;
+      margin: 0 auto;
+      background: transparent;
+      cursor: pointer;
+      writing-mode: vertical-lr;
+      direction: rtl;
+      transform: rotate(180deg);
+    }
+
+    .pixel-slider::-webkit-slider-runnable-track {
+      width: 4px;
+      margin: 0 auto;
+      background: var(--windows-blue);
+      border-radius: 0;
+    }
+
+    .pixel-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: var(--thumb-size);
+      height: var(--thumb-size);
+      background: var(--pixel-red);
+      border: none;
+      border-radius: 0;
+      margin-left: calc((var(--thumb-size) - 4px) / -2 + 0px);
+    }
+
+    .pixel-slider::-moz-range-track {
+      width: 4px;
+      background: var(--windows-blue);
+      border-radius: 0;
+    }
+
+    .pixel-slider::-moz-range-thumb {
+      width: var(--thumb-size);
+      height: var(--thumb-size);
+      background: var(--pixel-red);
+      border: none;
+      border-radius: 0;
+    }
+
+    .logo {
+      width: 368px;
+      height: auto;
+      display: block;
+      position: fixed;
+      left: 4px;
+      top: 4px;
+      z-index: 2;
+    }
+
+    .grid-area {
+      width: calc(100vw - 100px);
+      height: 100vh;
+      cursor: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      background: var(--windows-blue);
+      overflow: hidden;
+    }
+
+    .pixel {
+      background: var(--windows-blue);
+      cursor: none;
+    }
+
+    .pixel.hovered {
+      background: var(--pixel-red);
+    }
+
+    .pixel.active {
+      background: var(--pixel-red);
+    }
+
+    .pixel.special.hovered {
+      background: var(--pixel-yellow);
+    }
+
+    .pixel.special.active {
+      background: var(--pixel-yellow);
+    }
+
+    .popup {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(211, 211, 211, 0.1);
+      color: #ffffff;
+      padding: 10px 14px;
+      font-size: 12pt;
+      font-family: sans-serif;
+      font-weight: 700;
+      text-decoration: none;
+      border: 1px solid #ffffff;
+      border-radius: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s linear;
+      z-index: 10;
+    }
+
+    .popup.show {
+      opacity: 1;
+    }
+
+    .confetti-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      background: var(--pixel-red);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="left-column">
+      <img src="./golden_pixel.svg" alt="GOLDEN PIXEL logo" class="logo" />
+      <aside class="sidebar">
+        <div class="sidebar-icons">
+          <button type="button" class="icon-btn" id="insentiveButton" aria-label="goal" data-tooltip="objective">
+            <img src="./question-mark-svgrepo-com.svg" alt="" />
+          </button>
+          <button type="button" class="icon-btn" id="resetButton" aria-label="reset" data-tooltip="restart">
+            <img src="./reset-svgrepo-com.svg" alt="" />
+          </button>
+          <button type="button" class="icon-btn" id="exportButton" aria-label="export" data-tooltip="export">
+            <img src="./download-svgrepo-com%20(1).svg" alt="" />
+          </button>
+        </div>
+        <div class="pixel-slider-section">
+          <span class="slider-label slider-label--top">hard</span>
+          <div class="pixel-slider-wrap">
+            <input
+              type="range"
+              class="pixel-slider"
+              id="pixelSlider"
+              min="0"
+              max="100"
+              value="0"
+            />
+          </div>
+          <span class="slider-label slider-label--bottom">easy</span>
+        </div>
+      </aside>
+    </div>
+    <div class="grid-area" id="gridArea">
+      <div class="container" id="pixelContainer"></div>
+      <div class="confetti-layer" id="confettiLayer"></div>
+    </div>
+  </div>
+  <div class="popup" id="popupMessage">find the golden pixel</div>
+
+  <script>
+    const gridArea = document.getElementById("gridArea");
+    const container = document.getElementById("pixelContainer");
+    const insentiveButton = document.getElementById("insentiveButton");
+    const resetButton = document.getElementById("resetButton");
+    const exportButton = document.getElementById("exportButton");
+    const popupMessage = document.getElementById("popupMessage");
+    const confettiLayer = document.getElementById("confettiLayer");
+    const pixelSlider = document.getElementById("pixelSlider");
+    const CELEBRATION_MS = 4000;
+
+    let gridCols = 192;
+    let gridRows = 108;
+    let brushRadius = 0;
+    let specialIndex = 0;
+
+    let isMouseDown = false;
+    let popupTimer = null;
+    const pixels = [];
+    let hoveredPixels = new Set();
+    let isCelebrating = false;
+
+    function getGridFromSlider() {
+      const t = pixelSlider.valueAsNumber / 100;
+      const cols = 192;
+      const rows = 108;
+      const radius = Math.round(t * 3);
+      return { cols, rows, radius };
+    }
+
+    function updateThumbSize() {
+      const rect = container.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) {
+        return;
+      }
+      const cellW = rect.width / gridCols;
+      const cellH = rect.height / gridRows;
+      const singlePixelSize = Math.min(cellW, cellH);
+      const t = pixelSlider.valueAsNumber / 100;
+      const size = singlePixelSize * (1 + 6 * t);
+      document.documentElement.style.setProperty("--thumb-size", `${size}px`);
+    }
+
+    function indexToRowCol(index) {
+      return {
+        row: Math.floor(index / gridCols),
+        col: index % gridCols
+      };
+    }
+
+    function rowColToIndex(row, col) {
+      return row * gridCols + col;
+    }
+
+    function getRandomSpecialIndex(cols, rows, edgeMargin) {
+      const maxSafeMargin = Math.floor((Math.min(cols, rows) - 1) / 2);
+      const margin = Math.max(0, Math.min(edgeMargin, maxSafeMargin));
+      const minRow = margin;
+      const maxRow = rows - 1 - margin;
+      const minCol = margin;
+      const maxCol = cols - 1 - margin;
+      const row = minRow + Math.floor(Math.random() * (maxRow - minRow + 1));
+      const col = minCol + Math.floor(Math.random() * (maxCol - minCol + 1));
+      return row * cols + col;
+    }
+
+    function getAreaIndexes(centerIndex, radius) {
+      const indexes = [];
+      const { row, col } = indexToRowCol(centerIndex);
+      const minRow = Math.max(0, row - radius);
+      const maxRow = Math.min(gridRows - 1, row + radius);
+      const minCol = Math.max(0, col - radius);
+      const maxCol = Math.min(gridCols - 1, col + radius);
+
+      for (let r = minRow; r <= maxRow; r++) {
+        for (let c = minCol; c <= maxCol; c++) {
+          indexes.push(rowColToIndex(r, c));
+        }
+      }
+      return indexes;
+    }
+
+    function clearHoveredArea() {
+      hoveredPixels.forEach((index) => {
+        pixels[index].classList.remove("hovered");
+      });
+      hoveredPixels = new Set();
+    }
+
+    function getActiveIndexes() {
+      const active = [];
+      for (let i = 0; i < pixels.length; i++) {
+        if (pixels[i].classList.contains("active")) {
+          active.push(i);
+        }
+      }
+      return active;
+    }
+
+    function getHoveredIndexes() {
+      return Array.from(hoveredPixels);
+    }
+
+    function restoreState(activeIndexes, hoveredIndexes) {
+      pixels.forEach((pixel) => {
+        pixel.classList.remove("active");
+        pixel.classList.remove("hovered");
+      });
+      hoveredPixels = new Set();
+      activeIndexes.forEach((index) => {
+        if (pixels[index]) {
+          pixels[index].classList.add("active");
+        }
+      });
+      hoveredIndexes.forEach((index) => {
+        if (pixels[index]) {
+          pixels[index].classList.add("hovered");
+          hoveredPixels.add(index);
+        }
+      });
+    }
+
+    function showPopup(message, durationMs) {
+      popupMessage.textContent = message;
+      popupMessage.classList.add("show");
+      window.clearTimeout(popupTimer);
+      popupTimer = window.setTimeout(() => {
+        popupMessage.classList.remove("show");
+      }, durationMs);
+    }
+
+    function buildConfettiSources(activeIndexes, hoveredIndexes) {
+      const sourceSet = new Set();
+      activeIndexes.forEach((index) => {
+        if (index !== specialIndex) {
+          sourceSet.add(index);
+        }
+      });
+      hoveredIndexes.forEach((index) => {
+        if (index !== specialIndex) {
+          sourceSet.add(index);
+        }
+      });
+      if (sourceSet.size === 0) {
+        getAreaIndexes(specialIndex, 1).forEach((index) => {
+          if (index !== specialIndex) {
+            sourceSet.add(index);
+          }
+        });
+      }
+      return Array.from(sourceSet);
+    }
+
+    function startCelebration() {
+      if (isCelebrating) {
+        return;
+      }
+      isCelebrating = true;
+      isMouseDown = false;
+
+      const savedActive = getActiveIndexes();
+      const savedHovered = getHoveredIndexes();
+      const sources = buildConfettiSources(savedActive, savedHovered);
+      const rect = container.getBoundingClientRect();
+      const cellW = rect.width / gridCols;
+      const cellH = rect.height / gridRows;
+      const particles = [];
+      const maxParticles = Math.min(400, Math.max(30, sources.length * 3));
+
+      confettiLayer.innerHTML = "";
+      for (let i = 0; i < maxParticles; i++) {
+        const sourceIndex = sources[i % sources.length];
+        const { row, col } = indexToRowCol(sourceIndex);
+        const piece = document.createElement("div");
+        piece.className = "confetti-piece";
+        const size = Math.max(2, Math.min(cellW, cellH));
+        const x = col * cellW + Math.random() * cellW;
+        const y = row * cellH + Math.random() * cellH;
+        piece.style.width = `${size}px`;
+        piece.style.height = `${size}px`;
+        piece.style.left = `${x}px`;
+        piece.style.top = `${y}px`;
+        confettiLayer.appendChild(piece);
+        particles.push({
+          el: piece,
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 25,
+          vy: 60 + Math.random() * 160
+        });
+      }
+
+      showPopup("congratultions!", CELEBRATION_MS);
+      const start = performance.now();
+      let last = start;
+
+      function step(now) {
+        const dt = (now - last) / 1000;
+        last = now;
+        particles.forEach((p) => {
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.el.style.left = `${p.x}px`;
+          p.el.style.top = `${p.y}px`;
+        });
+
+        if (now - start < CELEBRATION_MS) {
+          requestAnimationFrame(step);
+          return;
+        }
+
+        confettiLayer.innerHTML = "";
+        restoreState(savedActive, savedHovered);
+        isCelebrating = false;
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    function applyHoverAt(index) {
+      if (isCelebrating) {
+        return;
+      }
+      clearHoveredArea();
+      const area = getAreaIndexes(index, brushRadius);
+      area.forEach((pixelIndex) => {
+        pixels[pixelIndex].classList.add("hovered");
+        hoveredPixels.add(pixelIndex);
+        if (isMouseDown) {
+          const specialJustFound =
+            pixelIndex === specialIndex && !pixels[pixelIndex].classList.contains("active");
+          pixels[pixelIndex].classList.add("active");
+          if (specialJustFound) {
+            startCelebration();
+          }
+        }
+      });
+    }
+
+    function attachPixelListeners(pixel, i) {
+      pixel.addEventListener("mouseenter", () => {
+        applyHoverAt(i);
+      });
+
+      pixel.addEventListener("mouseleave", () => {
+        if (brushRadius === 0) {
+          pixel.classList.remove("hovered");
+          hoveredPixels.delete(i);
+        }
+      });
+
+      pixel.addEventListener("click", () => {
+        if (isCelebrating) {
+          return;
+        }
+        const area = getAreaIndexes(i, brushRadius);
+        area.forEach((pixelIndex) => {
+          const willBeActive = !pixels[pixelIndex].classList.contains("active");
+          pixels[pixelIndex].classList.toggle("active");
+          if (pixelIndex === specialIndex && willBeActive) {
+            startCelebration();
+          }
+        });
+      });
+    }
+
+    function buildGrid() {
+      const { cols, rows, radius } = getGridFromSlider();
+      gridCols = cols;
+      gridRows = rows;
+      brushRadius = radius;
+      specialIndex = getRandomSpecialIndex(cols, rows, 7);
+
+      pixels.length = 0;
+      container.innerHTML = "";
+
+      container.style.gridTemplateColumns = `repeat(${gridCols}, 1fr)`;
+      container.style.gridTemplateRows = `repeat(${gridRows}, 1fr)`;
+
+      const total = gridCols * gridRows;
+      for (let i = 0; i < total; i++) {
+        const pixel = document.createElement("div");
+        pixel.classList.add("pixel");
+        pixel.dataset.index = String(i);
+        pixels.push(pixel);
+
+        if (i === specialIndex) {
+          pixel.classList.add("special");
+        }
+
+        attachPixelListeners(pixel, i);
+        container.appendChild(pixel);
+      }
+
+      clearHoveredArea();
+      updateThumbSize();
+    }
+
+    function updateBrushFromSlider() {
+      const { radius } = getGridFromSlider();
+      brushRadius = radius;
+      updateThumbSize();
+    }
+
+    container.addEventListener("mouseleave", () => {
+      clearHoveredArea();
+    });
+
+    document.addEventListener("mousedown", () => {
+      isMouseDown = true;
+    });
+
+    document.addEventListener("mouseup", () => {
+      isMouseDown = false;
+    });
+
+    document.addEventListener("mouseleave", () => {
+      isMouseDown = false;
+    });
+
+    insentiveButton.addEventListener("click", () => {
+      showPopup("find the golden pixel", 3000);
+    });
+
+    resetButton.addEventListener("click", () => {
+      pixels.forEach((pixel) => {
+        pixel.classList.remove("active");
+      });
+    });
+
+    exportButton.addEventListener("click", () => {
+      const exportCanvas = document.createElement("canvas");
+      const exportWidth = 1920;
+      const exportHeight = 1080;
+      const cellWidth = exportWidth / gridCols;
+      const cellHeight = exportHeight / gridRows;
+      const ctx = exportCanvas.getContext("2d");
+
+      exportCanvas.width = exportWidth;
+      exportCanvas.height = exportHeight;
+
+      if (!ctx) {
+        return;
+      }
+
+      for (let i = 0; i < pixels.length; i++) {
+        const pixel = pixels[i];
+        const isHovered = pixel.classList.contains("hovered");
+        const isActive = pixel.classList.contains("active");
+        const isSpecial = pixel.classList.contains("special");
+        const row = Math.floor(i / gridCols);
+        const col = i % gridCols;
+
+        let color = "#0078d7";
+        if (isSpecial && (isHovered || isActive)) {
+          color = "#ffd800";
+        } else if (isHovered || isActive) {
+          color = "#ff0000";
+        }
+
+        ctx.fillStyle = color;
+        ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
+      }
+
+      const imageUrl = exportCanvas.toDataURL("image/jpeg", 0.95);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = imageUrl;
+      downloadLink.download = "golden-pixel-grid.jpg";
+      downloadLink.click();
+    });
+
+    pixelSlider.addEventListener("input", () => {
+      updateBrushFromSlider();
+    });
+
+    window.addEventListener("resize", () => {
+      updateThumbSize();
+    });
+
+    buildGrid();
+    showPopup("find the golden pixel, you can hover, click and drag,", 3000);
+  </script>
+</body>
+</html>
