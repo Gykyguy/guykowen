@@ -205,38 +205,6 @@
       z-index: 520;
     }
 
-    .overlay-note {
-      position: fixed;
-      left: 24px;
-      top: 120px;
-      width: 260px;
-      z-index: 515;
-      display: none;
-      color: #111;
-      background: transparent;
-      pointer-events: none;
-    }
-
-    .overlay-note.active {
-      display: block;
-    }
-
-    .overlay-note.wayhome-left {
-      display: none;
-    }
-
-    .overlay-note h3 {
-      margin: 0 0 10px;
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .overlay-note p {
-      margin: 0;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
     .overlay-stack {
       width: min(100%, 860px);
       margin: 0 auto;
@@ -373,14 +341,6 @@
     </button>
   </main>
 
-  <aside class="overlay-note" id="overlay-note" aria-hidden="true">
-    <h3>Project Note</h3>
-    <p>
-      This is an example paragraph aligned from the left side. It appears only while a tile
-      is open, and does not change the existing scroll layout position.
-    </p>
-  </aside>
-
   <section class="overlay" id="overlay-sphere" aria-hidden="true">
     <button class="overlay-close" type="button" aria-label="Close">&times;</button>
     <div class="overlay-stack">
@@ -429,7 +389,6 @@
     const toggle = document.querySelector(".toggle");
     const tiles = document.querySelectorAll(".tile");
     const overlays = document.querySelectorAll(".overlay");
-    const overlayNote = document.getElementById("overlay-note");
     const logo = document.querySelector(".logo");
     const tileBodies = [];
     const logoBodies = [];
@@ -732,11 +691,6 @@
       if (!target) return;
       target.classList.add("active");
       target.setAttribute("aria-hidden", "false");
-      if (overlayNote) {
-        overlayNote.classList.add("active");
-        overlayNote.classList.toggle("wayhome-left", target.id === "overlay-wayhome");
-        overlayNote.setAttribute("aria-hidden", "false");
-      }
       target.querySelectorAll("video").forEach((video) => {
         video.currentTime = 0;
         if (target.id === "overlay-heart") {
@@ -752,11 +706,6 @@
         overlay.setAttribute("aria-hidden", "true");
         stopOverlayMedia(overlay);
       });
-      if (overlayNote) {
-        overlayNote.classList.remove("active");
-        overlayNote.classList.remove("wayhome-left");
-        overlayNote.setAttribute("aria-hidden", "true");
-      }
     }
 
     toggle.addEventListener("click", () => {
